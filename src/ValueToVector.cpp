@@ -2,9 +2,9 @@
 
 #include "ValueToVector.hpp"
 
-using namespace lob_base;
+using namespace general_processing;
 
-VectorToc() : type(Typelib::NullType), slice("") {}
+VectorToc::VectorToc() : mrType(Typelib::NullType("nil")), mSlice("") {}
 
 std::vector<double> VectorToc::valueToVector (const Typelib::Value& value) {
     std::vector<double> v;
@@ -29,7 +29,7 @@ Typelib::Value VectorToc::eigenToValue (const Eigen::VectorXd& vector) {
     return vectorToValue(v);
 }
 
-VectorToc VectorToc::concretToc (const TypelibValue& value) {
+VectorToc VectorToc::concreteToc (const Typelib::Value& value) {
     return *this;
 }
 
@@ -40,18 +40,38 @@ VectorToc VectorToc::slice (const std::string& slice) {
 
 VectorTocMaker::VectorTocMaker() : mPosition(0), mContainerLoop(0) {}
 
-bool VectorTocMaker::visit_ (NullType const& type);
-bool VectorTocMaker::visit_ (OpaqueType const& type);
-bool VectorTocMaker::visit_ (Numeric const& type);
-bool VectorTocMaker::visit_ (Enum const& type);
+bool VectorTocMaker::visit_ (Typelib::NullType const& type) {
+    return Typelib::TypeVisitor::visit_(type); 
+}
+bool VectorTocMaker::visit_ (Typelib::OpaqueType const& type) { 
+    return Typelib::TypeVisitor::visit_(type); 
+}
+bool VectorTocMaker::visit_ (Typelib::Numeric const& type) { 
+    return Typelib::TypeVisitor::visit_(type); 
+}
+bool VectorTocMaker::visit_ (Typelib::Enum const& type) {
+    return Typelib::TypeVisitor::visit_(type); 
+}
 
-bool VectorTocMaker::visit_ (Pointer const& type);
-bool VectorTocMaker::visit_ (Array const& type);
-bool VectorTocMaker::visit_ (Container const& type);
+bool VectorTocMaker::visit_ (Typelib::Pointer const& type) { 
+    return Typelib::TypeVisitor::visit_(type); 
+}
+bool VectorTocMaker::visit_ (Typelib::Array const& type) { 
+    return Typelib::TypeVisitor::visit_(type); 
+}
+bool VectorTocMaker::visit_ (Typelib::Container const& type) { 
+    return Typelib::TypeVisitor::visit_(type); 
+}
 
-bool VectorTocMaker::visit_ (Compound const& type);
-bool VectorTocMaker::visit_ (Compound const& type, Field const& field);
+bool VectorTocMaker::visit_ (Typelib::Compound const& type) { 
+    return Typelib::TypeVisitor::visit_(type); 
+}
+bool VectorTocMaker::visit_ (Typelib::Compound const& type, 
+    Typelib::Field const& field) { 
+    
+    return Typelib::TypeVisitor::visit_(type); 
+}
 
-VectorToc VectorTocMaker::apply (Typelib::Type const& type) {
-
+VectorToc VectorTocMaker::apply (Typelib::Type const& type) { 
+    return VectorToc(); 
 }

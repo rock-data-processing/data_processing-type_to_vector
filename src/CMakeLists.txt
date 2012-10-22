@@ -1,7 +1,10 @@
-rock_library(data_infrastructure
-    SOURCES Dummy.cpp
-    HEADERS Dummy.hpp)
+set(LIBSOURCES  Utilities.cpp
+                ValueToVector.cpp )
 
-rock_executable(data_infrastructure_bin Main.cpp
-    DEPS data_infrastructure)
+set(LIBHEADERS  Utilities.hpp
+                ValueToVector.hpp )
 
+rock_library(general_processing
+    SOURCES ${LIBSOURCES}
+    HEADERS ${LIBHEADERS}
+    DEPS_PKGCONFIG typelib eigen3)

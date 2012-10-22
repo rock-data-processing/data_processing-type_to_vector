@@ -11,13 +11,13 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef LOBBASE_UTILITIES_HPP
-#define LOBBASE_UTILITIES_HPP
+#ifndef GENERALPROCESSING_UTILITIES_HPP
+#define GENERALPROCESSING_UTILITIES_HPP
 
 #include <iostream>
-#include "VectorValueInfo.hpp"
+#include "ValueToVector.hpp"
 
-std::ostream& operator<< (std::ostream& os, const lob_base::VectorValueInfo& info):
-std::ostream& operator<< (std::ostream& os, const lob_base::VectorToc& toc);
+std::ostream& operator<< (std::ostream& os, const general_processing::VectorValueInfo& info);
+std::ostream& operator<< (std::ostream& os, const general_processing::VectorToc& toc);
 
-#endif //  LOBBASE_UTILITIES_HPP
+#endif //  GENERALPROCESSING_UTILITIES_HPP

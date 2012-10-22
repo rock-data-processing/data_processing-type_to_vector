@@ -11,16 +11,19 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef LOBBASE_VALUETOVECTOR_HPP
-#define LOBBASE_VALUETOVECTOR_HPP
+#ifndef GENERALPROCESSING_VALUETOVECTOR_HPP
+#define GENERALPROCESSING_VALUETOVECTOR_HPP
 
 #include <string>
 #include <vector>
 
 #include <typelib/typevisitor.hh>
 #include <typelib/typemodel.hh>
+#include <typelib/value.hh>
 
-namespace lob_base {
+#include <Eigen/Core>
+
+namespace general_processing {
 
 /** Information to which place in a type a vector value belongs. 
  *
@@ -40,12 +43,12 @@ struct VectorValueInfo {
  * This class holds the information where to find what in the type and how to put
  * it into a vector.
  */
-class VectorToc : protected std::vector<VectorValueInfo> {
+class VectorToc : public std::vector<VectorValueInfo> {
 
     friend class TypeTocMaker;
 
-    Typelib::Type const& type; //!< The type the toc is made for
-    std::string slice; //!< Slice operation made and marks a concrete toc
+    Typelib::Type const& mrType; //!< The type the toc is made for
+    std::string mSlice; //!< Slice operation made and marks a concrete toc
 
 public:
     VectorToc();
@@ -62,10 +65,16 @@ public:
 
     /** Choose parts of a vector. */
     VectorToc slice (const std::string& slice);
+
+    /** The name of the type the toc is for. */
+    std::string typeName() const { return mrType.getName(); }
+
+    /** The slice string used for this toc. */
+    std::string sliceString() const { return mSlice; }
 };
 
 /** Finds out where in the vector to find which part of the \c Typelib::Type. */
-class VectorTocMaker: public Typelib::TypeVisitor {a
+class VectorTocMaker: public Typelib::TypeVisitor {
     
     VectorToc mToc;
     unsigned int mPosition;
@@ -75,17 +84,17 @@ class VectorTocMaker: public Typelib::TypeVisitor {a
     VectorTocMaker();
     
 protected:    
-    virtual bool visit_ (NullType const& type);
-    virtual bool visit_ (OpaqueType const& type);
-    virtual bool visit_ (Numeric const& type);
-    virtual bool visit_ (Enum const& type);
+    virtual bool visit_ (Typelib::NullType const& type);
+    virtual bool visit_ (Typelib::OpaqueType const& type);
+    virtual bool visit_ (Typelib::Numeric const& type);
+    virtual bool visit_ (Typelib::Enum const& type);
 
-    virtual bool visit_ (Pointer const& type);
-    virtual bool visit_ (Array const& type);
-    virtual bool visit_ (Container const& type);
+    virtual bool visit_ (Typelib::Pointer const& type);
+    virtual bool visit_ (Typelib::Array const& type);
+    virtual bool visit_ (Typelib::Container const& type);
 
-    virtual bool visit_ (Compound const& type);
-    virtual bool visit_ (Compound const& type, Field const& field);
+    virtual bool visit_ (Typelib::Compound const& type);
+    virtual bool visit_ (Typelib::Compound const& type,Typelib::Field const& field);
 
 public:
     static VectorToc apply (Typelib::Type const& type);
@@ -93,5 +102,5 @@ public:
 
 }
 
-#endif // LOBBASE_VALUETOVECTOR_HPP
+#endif // GENERALPROCESSING_VALUETOVECTOR_HPP
 
