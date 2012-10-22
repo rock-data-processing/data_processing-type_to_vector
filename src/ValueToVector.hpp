@@ -25,6 +25,8 @@
 
 namespace general_processing {
 
+struct VectorToc;
+
 /** Information to which place in a type a vector value belongs. 
  *
  * Only types that should be stored is numerics and containers.
@@ -33,9 +35,12 @@ namespace general_processing {
 struct VectorValueInfo {
     std::string placeDescription; //!< Something like position[3], rotation.im[1] or ...
     unsigned int position; //!< The position in bytes in the memory of this value.
-    Typelib::Type const& type; //!< Type of the value at the given position.
-    unsigned int containerLoop; //!< For resolving containers with unknown size in advanced.
-    std::string containerSlice; //!< For when one wants to take parts of a container.
+    CastFunction* castFun; //!< To cast the value 0 for container or other type.
+    std::string slice; //!< If there is a slice to be regarded in a container type.
+    VectorToc* content; //!< Subcontent (is needed mostly for containers).
+
+    VectorValueInfo();
+    bool operator== (const VectorValueInfo& other);
 };
 
 /** Table of contents for the vector made of a type.
@@ -43,14 +48,11 @@ struct VectorValueInfo {
  * This class holds the information where to find what in the type and how to put
  * it into a vector.
  */
-class VectorToc : public std::vector<VectorValueInfo> {
+struct VectorToc : public std::vector<VectorValueInfo> {
 
-    friend class TypeTocMaker;
+    std::string mType; //!< The type the toc is made for.
+    std::string mSlice; //!< Slice operation made and marks a concrete toc.
 
-    Typelib::Type const& mrType; //!< The type the toc is made for
-    std::string mSlice; //!< Slice operation made and marks a concrete toc
-
-public:
     VectorToc();
 
     std::vector<double> valueToVector (const Typelib::Value& value);
@@ -66,11 +68,8 @@ public:
     /** Choose parts of a vector. */
     VectorToc slice (const std::string& slice);
 
-    /** The name of the type the toc is for. */
-    std::string typeName() const { return mrType.getName(); }
-
-    /** The slice string used for this toc. */
-    std::string sliceString() const { return mSlice; }
+    /** Equality operator. */
+    bool operator== (const VectorToc& other);
 };
 
 /** Finds out where in the vector to find which part of the \c Typelib::Type. */
@@ -81,7 +80,7 @@ class VectorTocMaker: public Typelib::TypeVisitor {
     unsigned int mContainerLoop; 
     std::vector<std::string> mPlaceStack;
 
-    VectorTocMaker();
+    VectorTocMaker(TypeLib::Type const& type);
     
 protected:    
     virtual bool visit_ (Typelib::NullType const& type);
@@ -101,6 +100,5 @@ public:
 };
 
 }
-
 #endif // GENERALPROCESSING_VALUETOVECTOR_HPP
 
