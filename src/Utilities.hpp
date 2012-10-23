@@ -15,7 +15,9 @@
 #define GENERALPROCESSING_UTILITIES_HPP
 
 #include <iostream>
-#include "ValueToVector.hpp"
+
+struct general_processing::VectorValueInfo;
+struct general_processing::VectorToc;
 
 std::ostream& operator<< (std::ostream& os, const general_processing::VectorValueInfo& info);
 std::ostream& operator<< (std::ostream& os, const general_processing::VectorToc& toc);

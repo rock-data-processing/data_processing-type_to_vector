@@ -23,6 +23,8 @@
 
 #include <Eigen/Core>
 
+#include "NumericConverter.hpp"
+
 namespace general_processing {
 
 struct VectorToc;
@@ -31,16 +33,15 @@ struct VectorToc;
  *
  * Only types that should be stored is numerics and containers.
  * Containers will not increase the position. They have to be
- * determined during conversion time. */
+ * determined during convertion time. */
 struct VectorValueInfo {
     std::string placeDescription; //!< Something like position[3], rotation.im[1] or ...
     unsigned int position; //!< The position in bytes in the memory of this value.
-    CastFunction* castFun; //!< To cast the value 0 for container or other type.
-    std::string slice; //!< If there is a slice to be regarded in a container type.
+    CastFunction* castFun; //!< To cast the value, 0 for container or other type.
     VectorToc* content; //!< Subcontent (is needed mostly for containers).
 
     VectorValueInfo();
-    bool operator== (const VectorValueInfo& other);
+    bool operator== (const VectorValueInfo& other) const;
 };
 
 /** Table of contents for the vector made of a type.
@@ -80,7 +81,7 @@ class VectorTocMaker: public Typelib::TypeVisitor {
     unsigned int mContainerLoop; 
     std::vector<std::string> mPlaceStack;
 
-    VectorTocMaker(TypeLib::Type const& type);
+    VectorTocMaker(Typelib::Type const& type);
     
 protected:    
     virtual bool visit_ (Typelib::NullType const& type);
