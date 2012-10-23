@@ -1,5 +1,5 @@
 /**
- * \file  ValueToVector.hpp
+ * \file VectorToc.hpp
  *
  * \brief Converting typelib types to an vector (flatten it).
  *
@@ -11,13 +11,12 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef GENERALPROCESSING_VALUETOVECTOR_HPP
-#define GENERALPROCESSING_VALUETOVECTOR_HPP
+#ifndef GENERALPROCESSING_VECTORTOC_HPP
+#define GENERALPROCESSING_VECTORTOC_HPP
 
 #include <string>
 #include <vector>
 
-#include <typelib/typevisitor.hh>
 #include <typelib/typemodel.hh>
 #include <typelib/value.hh>
 
@@ -28,6 +27,7 @@
 namespace general_processing {
 
 struct VectorToc;
+class VectorTocVisitor;
 
 /** Information to which place in a type a vector value belongs. 
  *
@@ -35,14 +35,21 @@ struct VectorToc;
  * Containers will not increase the position. They have to be
  * determined during convertion time. */
 struct VectorValueInfo {
-    std::string placeDescription; //!< Something like position[3], rotation.im[1] or ...
+    std::string placeDescription; //!< Something like position.3, rotation.im.1 or ...
     unsigned int position; //!< The position in bytes in the memory of this value.
     CastFunction* castFun; //!< To cast the value, 0 for container or other type.
     VectorToc* content; //!< Subcontent (is needed mostly for containers).
 
+protected:
+    class DeleteVisitor; //!< To also delete recursivly all content.
+ 
+public:
     VectorValueInfo();
+    ~VectorValueInfo();
+
     bool operator== (const VectorValueInfo& other) const;
 };
+
 
 /** Table of contents for the vector made of a type.
  *
@@ -53,6 +60,7 @@ struct VectorToc : public std::vector<VectorValueInfo> {
 
     std::string mType; //!< The type the toc is made for.
     std::string mSlice; //!< Slice operation made and marks a concrete toc.
+    int maxDepth; //!< Maximum recursion depth for the visitors.
 
     VectorToc();
 
@@ -71,35 +79,22 @@ struct VectorToc : public std::vector<VectorValueInfo> {
 
     /** Equality operator. */
     bool operator== (const VectorToc& other);
+
+private:
+    class EqualityVisitor;
 };
 
-/** Finds out where in the vector to find which part of the \c Typelib::Type. */
-class VectorTocMaker: public Typelib::TypeVisitor {
-    
-    VectorToc mToc;
-    unsigned int mPosition;
-    unsigned int mContainerLoop; 
-    std::vector<std::string> mPlaceStack;
-
-    VectorTocMaker(Typelib::Type const& type);
-    
-protected:    
-    virtual bool visit_ (Typelib::NullType const& type);
-    virtual bool visit_ (Typelib::OpaqueType const& type);
-    virtual bool visit_ (Typelib::Numeric const& type);
-    virtual bool visit_ (Typelib::Enum const& type);
-
-    virtual bool visit_ (Typelib::Pointer const& type);
-    virtual bool visit_ (Typelib::Array const& type);
-    virtual bool visit_ (Typelib::Container const& type);
-
-    virtual bool visit_ (Typelib::Compound const& type);
-    virtual bool visit_ (Typelib::Compound const& type,Typelib::Field const& field);
-
+/** To recursivly go into containers. */
+class VectorTocVisitor {
+    int mDepth, mMaxDepth; //!< Max recursive depth (<0 means no depth limit).
+protected:
+    virtual void visit(VectorValueInfo const& info);
+    virtual void visit(VectorToc const& toc);
 public:
-    static VectorToc apply (Typelib::Type const& type);
-};
-
+    VectorTocVisitor(int max_depth=-1) : mMaxDepth(max_depth), mDepth(0) {}
 }
-#endif // GENERALPROCESSING_VALUETOVECTOR_HPP
+
+
+} // namespace general_processing
+#endif // GENERALPROCESSING_VECTORTOC_HPP
 

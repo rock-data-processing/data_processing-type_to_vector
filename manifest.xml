@@ -1,6 +1,6 @@
 <package>
   <description brief="Elements needed for the general data processing.">
-      Elements to enable the general data processing like type to vector conversion or 
+      Elements to enable the general data processing like type to vector convertion or 
       a learning interface.
   </description>
   <author>Felix Rehrmann/felix.rehrmann@dfki.de</author>

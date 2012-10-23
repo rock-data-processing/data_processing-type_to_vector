@@ -1,8 +1,11 @@
 set(LIBSOURCES  Utilities.cpp
-                ValueToVector.cpp )
+                VectorToc.hpp
+                VectorTocMaker.hpp )
 
 set(LIBHEADERS  Utilities.hpp
-                ValueToVector.hpp )
+                VectorToc.hpp 
+                VectorTocMaker.hpp
+                NumerivConverter.hpp )
 
 rock_library(general_processing
     SOURCES ${LIBSOURCES}
