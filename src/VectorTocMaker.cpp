@@ -4,7 +4,7 @@
 
 using namespace general_processing;
 
-VectorTocMaker::VectorTocMaker(Typelib::Type const& type) : 
+VectorTocMaker::VectorTocMaker() : 
     mPosition(0), mContainerLoop(0) {}
 
 bool VectorTocMaker::visit_ (Typelib::NullType const& type) {
@@ -40,6 +40,5 @@ bool VectorTocMaker::visit_ (Typelib::Compound const& type,
 }
 
 VectorToc VectorTocMaker::apply (Typelib::Type const& type) {
-    VectorTocMaker toc_maker(type); 
-    return toc_maker.mToc; 
+    return mToc; 
 }

@@ -27,13 +27,12 @@
 namespace general_processing {
 
 struct VectorToc;
-class VectorTocVisitor;
 
 /** Information to which place in a type a vector value belongs. 
  *
  * Only types that should be stored is numerics and containers.
  * Containers will not increase the position. They have to be
- * determined during convertion time. */
+ * determined during conversion time. */
 struct VectorValueInfo {
     std::string placeDescription; //!< Something like position.3, rotation.im.1 or ...
     unsigned int position; //!< The position in bytes in the memory of this value.
@@ -96,7 +95,6 @@ protected:
 public:
     VectorTocVisitor(int max_depth=-1) : mMaxDepth(max_depth), mDepth(0) {}
 };
-
 
 } // namespace general_processing
 #endif // GENERALPROCESSING_VECTORTOC_HPP

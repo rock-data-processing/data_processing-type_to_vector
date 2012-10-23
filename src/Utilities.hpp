@@ -42,6 +42,26 @@ public:
     std::vector<std::string> apply( VectorToc const& toc );
 };
 
+/** Determines whether two tocs are equal or not. */
+class EqualityVisitor : public VectorTocVisitor {
+    bool mEqual;
+    const VectorToc& mThisToc;
+    std::vector<const VectorToc*> mOtherStack;
+    const VectorValueInfo* mOtherInfo;
+
+protected:
+    void visit(VectorValueInfo const& info);
+    void visit(VectorToc const& toc);
+
+public:
+    EqualityVisitor(const VectorToc& this_toc, int max_depth=-1) : 
+        VectorTocVisitor(max_depth), mThisToc(this_toc), mOtherInfo(0) {}
+
+    bool apply(const VectorToc& other);
+};
+
+bool operator== (const VectorToc& one, const VectorToc& two);
+
 } // namespace general_processing
 
 #endif //  GENERALPROCESSING_UTILITIES_HPP

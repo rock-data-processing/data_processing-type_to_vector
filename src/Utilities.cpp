@@ -46,5 +46,53 @@ std::vector<std::string> PlainTocVisitor::apply( VectorToc const& toc ) {
     visit(toc);
     return mPlainToc;
 }
+    
 
+void EqualityVisitor::visit(VectorValueInfo const& info) {
+    if ( !(*mOtherInfo == info) ) {
+        mEqual = false;
+        return;
+    }
+
+    if ( mOtherInfo->content && info.content ) {
+        mOtherStack.push_back(mOtherInfo->content);
+        VectorTocVisitor::visit(info);
+        mOtherStack.pop_back();
+    }
+    else if ( (info.content == 0) != (mOtherInfo->content == 0) ) {
+        mEqual = false;
+        return;
+    }
+}
+
+void EqualityVisitor::visit(VectorToc const& toc){
+    if ( toc.mType != mOtherStack.back()->mType || 
+         toc.mSlice != mOtherStack.back()->mSlice ||
+         toc.size() != mOtherStack.back()->size() ) {
+        
+        mEqual = false;
+        return;
+    }
+
+    VectorToc::const_iterator it = toc.begin(), oit = mOtherStack.back()->begin();
+    for ( ; it != toc.end(); it++, oit++ ) {
+        mOtherInfo = &(*oit);
+        visit(*it);
+        if (!mEqual) break;
+    }
+}
+
+bool EqualityVisitor::apply(const VectorToc& other) {
+    mEqual = true;
+    mOtherStack.clear();
+    mOtherStack.push_back(&other);
+    visit(mThisToc);
+    return mEqual;
+}
+
+
+bool operator== (const VectorToc& one, const VectorToc& two) {
+    EqualityVisitor ev(one);
+    return ev.apply(two);
+}
 
