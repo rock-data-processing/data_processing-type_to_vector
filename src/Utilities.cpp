@@ -1,6 +1,5 @@
 // \file  Utilities.cpp
 
-#include "VectorToc.hpp"
 #include "Utilities.hpp"
 
 using namespace general_processing;
@@ -22,3 +21,30 @@ std::ostream& operator<< (std::ostream& os, const VectorToc& toc) {
     }
     return os;
 }
+
+
+void PlainTocVisitor::push_place () {
+    mPlainToc.push_back(utilmm::join(mPlaceStack,"."));
+}
+
+void PlainTocVisitor::visit ( VectorValueInfo const& info ) {
+    mPlaceStack.push_back(info.placeDescription); 
+    if (!info.content) push_place();
+    else VectorTocVisitor::visit(info);
+    mPlaceStack.pop_back();
+}
+
+void PlainTocVisitor::visit ( VectorToc const& toc ) {
+    mPlaceStack.push_back("*");
+    VectorTocVisitor::visit(toc);
+    mPlaceStack.pop_back();
+}
+
+std::vector<std::string> PlainTocVisitor::apply( VectorToc const& toc ) {
+    mPlainToc.clear();
+    mPlaceStack.clear();
+    visit(toc);
+    return mPlainToc;
+}
+
+

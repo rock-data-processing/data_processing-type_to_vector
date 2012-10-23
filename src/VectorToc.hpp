@@ -70,8 +70,10 @@ struct VectorToc : public std::vector<VectorValueInfo> {
     Typelib::Value vectorToValue (const std::vector<double>& vector);
     Typelib::Value eigenToValue (const Eigen::VectorXd& vector);
     
-    /** Gives the concret toc for a certain value. That is necessary when containers are 
-     * part of the type. */
+    /** Gives the concret toc for a certain value. 
+     *
+     * The toc is different if containers are part of the type. 
+     * The size for containers is dertermined and the toc has only one level.*/
     VectorToc concreteToc (const Typelib::Value& value);
 
     /** Choose parts of a vector. */
@@ -86,13 +88,14 @@ private:
 
 /** To recursivly go into containers. */
 class VectorTocVisitor {
-    int mDepth, mMaxDepth; //!< Max recursive depth (<0 means no depth limit).
+    int mMaxDepth; //!< Max recursive depth (<0 means no depth limit).
+    int mDepth;
 protected:
     virtual void visit(VectorValueInfo const& info);
     virtual void visit(VectorToc const& toc);
 public:
     VectorTocVisitor(int max_depth=-1) : mMaxDepth(max_depth), mDepth(0) {}
-}
+};
 
 
 } // namespace general_processing
