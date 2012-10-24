@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE ( test_toc_struct ) {
     BOOST_CHECK ( utilmm::join(sl) == "a b c d" );
 }
 
-BOOST_AUTO_TEST_CASE ( test_toc_conatiner ) {
+BOOST_AUTO_TEST_CASE ( test_toc_container ) {
 
     Typelib::Registry registry;
 
@@ -131,13 +131,11 @@ BOOST_AUTO_TEST_CASE ( test_toc_conatiner ) {
 
     std::string type_str = "/std/vector</int>";
 
-    BOOST_REQUIRE ( registry.has(type_str) );
-    registry.build(type_str);
     BOOST_REQUIRE ( registry.has(type_str, false) );
 
     VectorToc toc = VectorTocMaker().apply(*registry.get(type_str));
 
-    BOOST_CHECK ( toc.mType == type_str );
+    BOOST_CHECK ( toc.mType == "/std/vector</int32_t>" );
     BOOST_REQUIRE ( toc.size() == 1 );
     
     BOOST_CHECK ( toc.back().placeDescription == "*");
