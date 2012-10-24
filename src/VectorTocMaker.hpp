@@ -16,6 +16,8 @@
 
 #include <typelib/typevisitor.hh>
 #include <typelib/typemodel.hh>
+#include <utilmm/stringtools.hh>
+
 #include "VectorToc.hpp"
 
 namespace general_processing {
@@ -24,9 +26,11 @@ namespace general_processing {
 class VectorTocMaker: public Typelib::TypeVisitor {
     
     VectorToc mToc;
+    std::vector<VectorToc> mTocStack;
+    utilmm::stringlist mPlaceStack;
     unsigned int mPosition;
-    unsigned int mContainerLoop; 
-    std::vector<std::string> mPlaceStack;
+
+    void push_valueinfo(Typelib::Type const& type);
 
 protected:    
     virtual bool visit_ (Typelib::NullType const& type);
