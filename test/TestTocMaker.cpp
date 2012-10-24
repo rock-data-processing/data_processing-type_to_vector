@@ -181,3 +181,54 @@ BOOST_AUTO_TEST_CASE ( test_toc_string ) {
     BOOST_CHECK ( utilmm::join(sl) == "*" );
 }
 
+namespace plain_tocs {
+
+std::string DoubleVector = "a dbl_vector.*";
+std::string VectorArray = "dbl_vector_array.0.* dbl_vector_array.1.* "
+    "dbl_vector_array.2.*";
+std::string StructArray = "A_vector.*.a A_vector.*.b A_vector.*.c A_vector.*.d";
+std::string ContainerContainer = "dbl_vv.*.a dbl_vv.*.dbl_vector.*";
+
+} // plain_toc
+
+BOOST_AUTO_TEST_CASE ( test_toc_advanced ) {
+    
+    Typelib::Registry registry;
+
+    import_types(registry);
+
+    BOOST_REQUIRE ( registry.has("/DoubleVector",false) );
+    {
+        VectorToc toc = VectorTocMaker().apply(*registry.get("/DoubleVector"));
+        std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
+        utilmm::stringlist sl(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl) == plain_tocs::DoubleVector );
+    }
+    
+    BOOST_REQUIRE ( registry.has("/VectorArray",false) );
+    {
+        VectorToc toc = VectorTocMaker().apply(*registry.get("/VectorArray"));
+        std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
+        utilmm::stringlist sl(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl) == plain_tocs::VectorArray );
+    }
+    
+    BOOST_REQUIRE ( registry.has("/StructArray",false) );
+    {
+        VectorToc toc = VectorTocMaker().apply(*registry.get("/StructArray"));
+        std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
+        utilmm::stringlist sl(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl) == plain_tocs::StructArray );
+    }
+    
+    BOOST_REQUIRE ( registry.has("/ContainerContainer",false) );
+    {
+        VectorToc toc = VectorTocMaker().apply(*registry.get("/ContainerContainer"));
+        std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
+        utilmm::stringlist sl(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl) == plain_tocs::ContainerContainer );
+    }
+
+    
+}
+
