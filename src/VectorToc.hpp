@@ -72,12 +72,9 @@ struct VectorToc : public std::vector<VectorValueInfo> {
     /** Gives the concret toc for a certain value. 
      *
      * The toc is different if containers are part of the type. 
-     * The size for containers is dertermined and the toc has only one level.*/
+     * The size for containers is determined and the toc has only one level.
+     * The slice is regarded as well.*/
     VectorToc concreteToc (const Typelib::Value& value);
-
-    /** Choose parts of a vector. */
-    VectorToc slice (const std::string& slice);
-
 
 private:
     class EqualityVisitor;

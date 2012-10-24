@@ -76,10 +76,6 @@ VectorToc VectorToc::concreteToc (const Typelib::Value& value) {
     return *this;
 }
 
-VectorToc VectorToc::slice (const std::string& slice) {
-    return *this;
-}
-
 
 void VectorTocVisitor::visit(VectorValueInfo const& info) {
     if (info.content) {
