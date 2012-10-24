@@ -17,6 +17,9 @@
 #include <vector>
 #include <string>
 
+
+typedef std::vector<int> IntVec;
+
 struct A {
     long long a;
     int b;
