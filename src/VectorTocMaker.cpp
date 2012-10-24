@@ -59,8 +59,10 @@ bool VectorTocMaker::visit_ (Typelib::Compound const& type) {
 }
 bool VectorTocMaker::visit_ (Typelib::Compound const& type, 
     Typelib::Field const& field) { 
-    
-    return Typelib::TypeVisitor::visit_(type); 
+   
+    mPlaceStack.push_back(field.getName());
+    Typelib::TypeVisitor::visit_(type, field); 
+    mPlaceStack.pop_back();
 }
 
 VectorToc VectorTocMaker::apply (Typelib::Type const& type) {
