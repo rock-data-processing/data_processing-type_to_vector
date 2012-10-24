@@ -60,8 +60,15 @@ public:
     bool apply(const VectorToc& other);
 };
 
-bool operator== (const VectorToc& one, const VectorToc& two);
+
+bool operator== (const VectorToc& one, 
+        const VectorToc& two);
+
+inline bool operator!= (const VectorToc& one, 
+        const VectorToc& two) { return !operator==(one,two); }
 
 } // namespace general_processing
+
+
 
 #endif //  GENERALPROCESSING_UTILITIES_HPP

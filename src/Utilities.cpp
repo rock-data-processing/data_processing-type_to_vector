@@ -91,7 +91,7 @@ bool EqualityVisitor::apply(const VectorToc& other) {
 }
 
 
-bool operator== (const VectorToc& one, const VectorToc& two) {
+bool general_processing::operator== (const VectorToc& one, const VectorToc& two) {
     EqualityVisitor ev(one);
     return ev.apply(two);
 }

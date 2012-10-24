@@ -78,8 +78,6 @@ struct VectorToc : public std::vector<VectorValueInfo> {
     /** Choose parts of a vector. */
     VectorToc slice (const std::string& slice);
 
-    /** Equality operator. */
-    bool operator== (const VectorToc& other);
 
 private:
     class EqualityVisitor;
