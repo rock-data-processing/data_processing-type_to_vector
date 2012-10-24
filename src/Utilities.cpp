@@ -43,7 +43,7 @@ void PlainTocVisitor::visit ( VectorToc const& toc ) {
 std::vector<std::string> PlainTocVisitor::apply( VectorToc const& toc ) {
     mPlainToc.clear();
     mPlaceStack.clear();
-    visit(toc);
+    VectorTocVisitor::visit(toc);
     return mPlainToc;
 }
     
