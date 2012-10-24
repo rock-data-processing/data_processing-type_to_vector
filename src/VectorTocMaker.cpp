@@ -1,5 +1,7 @@
 // \file  VectorTocMaker.cpp
 
+#include <sstream>
+
 #include "VectorTocMaker.hpp"
 
 using namespace general_processing;
@@ -36,9 +38,18 @@ bool VectorTocMaker::visit_ (Typelib::Enum const& type) {
 bool VectorTocMaker::visit_ (Typelib::Pointer const& type) { 
     return Typelib::TypeVisitor::visit_(type); 
 }
-bool VectorTocMaker::visit_ (Typelib::Array const& type) { 
-    return Typelib::TypeVisitor::visit_(type); 
+
+bool VectorTocMaker::visit_ (Typelib::Array const& type) {
+    for (int i=0; i<type.getDimension(); i++ ) {
+        std::stringstream ss;
+        ss << i;
+        mPlaceStack.push_back(ss.str());
+        Typelib::TypeVisitor::visit_(type);
+        mPlaceStack.pop_back();
+    }
+    return true;
 }
+
 bool VectorTocMaker::visit_ (Typelib::Container const& type) { 
     return Typelib::TypeVisitor::visit_(type); 
 }
