@@ -22,6 +22,15 @@ std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& sv) {
     return os;
 }
 
+BOOST_AUTO_TEST_CASE ( test_empty_toc ) {
+    VectorToc toc;
+
+    BOOST_CHECK(toc.empty());
+    BOOST_CHECK(toc.mType=="");
+    BOOST_CHECK(toc.mSlice=="");
+    BOOST_CHECK(PlainTocVisitor().apply(toc).empty()); 
+}
+
 BOOST_AUTO_TEST_CASE ( test_single_level ) {
 
     std::vector<std::string> plain_toc;

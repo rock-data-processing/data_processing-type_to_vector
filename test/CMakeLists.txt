@@ -7,11 +7,18 @@
 #endif (NOT TYPELIB_PLUGIN_PATH)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_BINARY_DIR}/test)
+
+configure_file(create_tlb.rb.in ${CMAKE_BINARY_DIR}/test/create_tlb.rb)
+configure_file(TestSuite.hpp.in ${CMAKE_BINARY_DIR}/test/TestSuite.hpp)
 
 rock_executable( general_processing_test
-    SOURCES TestSuite.cpp TestToc.cpp
+    SOURCES TestSuite.cpp TestToc.cpp TestTocMaker.cpp
     DEPS general_processing
     DEPS_CMAKE Boost
     NOINSTALL)
+
+add_custom_command( TARGET general_processing_test POST_BUILD
+    COMMAND "ruby" ARGS "create_tlb.rb" ">" "TestTypes.tlb")
     
 # DEPS_PKGCONFIG typelib eigen3
