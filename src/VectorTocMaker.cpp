@@ -40,29 +40,38 @@ bool VectorTocMaker::visit_ (Typelib::Pointer const& type) {
 }
 
 bool VectorTocMaker::visit_ (Typelib::Array const& type) {
+
     for (int i=0; i<type.getDimension(); i++ ) {
         std::stringstream ss;
         ss << i;
         mPlaceStack.push_back(ss.str());
-        Typelib::TypeVisitor::visit_(type);
+        bool result = Typelib::TypeVisitor::visit_(type);
         mPlaceStack.pop_back();
+        if (!result) return false;
     }
     return true;
 }
 
-bool VectorTocMaker::visit_ (Typelib::Container const& type) { 
-    return Typelib::TypeVisitor::visit_(type); 
+bool VectorTocMaker::visit_ (Typelib::Container const& type) {
+   
+    mPlaceStack.push_back("*");
+    bool result = Typelib::TypeVisitor::visit_(type);
+    mPlaceStack.pop_back();
+    return result;
 }
 
 bool VectorTocMaker::visit_ (Typelib::Compound const& type) { 
     return Typelib::TypeVisitor::visit_(type); 
 }
+
 bool VectorTocMaker::visit_ (Typelib::Compound const& type, 
     Typelib::Field const& field) { 
    
     mPlaceStack.push_back(field.getName());
-    Typelib::TypeVisitor::visit_(type, field); 
+    bool result = Typelib::TypeVisitor::visit_(type, field); 
     mPlaceStack.pop_back();
+
+    return result;
 }
 
 VectorToc VectorTocMaker::apply (Typelib::Type const& type) {
