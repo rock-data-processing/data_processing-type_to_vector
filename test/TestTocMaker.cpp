@@ -41,7 +41,10 @@ BOOST_AUTO_TEST_CASE ( test_scalar ) {
     BOOST_CHECK ( toc.mSlice == "");
     BOOST_REQUIRE ( toc.size() == 1 );
     BOOST_CHECK ( toc.back().placeDescription == "");
-    BOOST_CHECK ( toc.back().castFun == getCastFunction(*registry.get("/double")) );
+    BOOST_REQUIRE ( toc.back().castFun != 0 );
+
+    double val = 1.4;
+    BOOST_CHECK ( toc.back().castFun(&val) == val );
     BOOST_CHECK ( toc.back().content == 0 );
     BOOST_CHECK ( PlainTocVisitor().apply(toc).size() == 1 );
     BOOST_CHECK ( PlainTocVisitor().apply(toc)[0] == "" );
