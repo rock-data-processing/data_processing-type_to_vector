@@ -76,6 +76,8 @@ struct VectorToc : public std::vector<VectorValueInfo> {
      * The slice is regarded as well.*/
     VectorToc concreteToc (const Typelib::Value& value);
 
+    void clear();
+
 private:
     class EqualityVisitor;
 };

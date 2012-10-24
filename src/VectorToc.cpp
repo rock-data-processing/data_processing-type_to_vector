@@ -76,6 +76,12 @@ VectorToc VectorToc::concreteToc (const Typelib::Value& value) {
     return *this;
 }
 
+void VectorToc::clear() {
+    mType = "";
+    mSlice = "";
+    std::vector<VectorValueInfo>::clear();
+}
+
 
 void VectorTocVisitor::visit(VectorValueInfo const& info) {
     if (info.content) {
