@@ -28,6 +28,11 @@ struct A {
     short d;
 };
 
+struct B {
+    char a;
+    A b;
+};
+
 struct DoubleVector {
     int a;
     std::vector<double> dbl_vector;

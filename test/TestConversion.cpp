@@ -9,7 +9,7 @@
 
 #include "Converter.hpp"
 #include "VectorTocMaker.hpp"
-
+#include "TestTypes.h"
 
 using namespace Typelib;
 using namespace general_processing;
@@ -68,6 +68,21 @@ BOOST_AUTO_TEST_CASE( test_convert_array )
     Registry registry;
     import_types(registry);
 
+    registry.build("/double[3]");
+    const Type& t = *registry.get("/double[3]");
+
+    double d[] = { 1.4, -123.2, 54.8 };
+ 
+    Value v(&d, t);
+
+    VectorToc toc = VectorTocMaker().apply(t); 
+
+    ConvertToVector ctv(toc);
+
+    std::vector<double> dbl_vec;
+    for (int i=0; i<3; i++) dbl_vec.push_back(d[i]);
+
+    BOOST_CHECK( dbl_vec == ctv.apply(v) );
 
 }
 
@@ -76,6 +91,59 @@ BOOST_AUTO_TEST_CASE( test_convert_struct )
     Registry registry;
     import_types(registry);
 
+    struct A a = { 100, -23, 'c', 12 };
+    
+    const Type& t = *registry.get("/A");
+
+    Value v(&a, t);
+
+    VectorToc toc = VectorTocMaker().apply(t);
+    
+    ConvertToVector ctv(toc);
+    
+    std::vector<double> dbl_vec;
+    dbl_vec.push_back(double(a.a));
+    dbl_vec.push_back(double(a.b));
+    dbl_vec.push_back(double(a.c));
+    dbl_vec.push_back(double(a.d));
+
+    std::vector<double> res = ctv.apply(v);
+
+    BOOST_REQUIRE ( res.size() == dbl_vec.size() );
+
+    BOOST_CHECK( dbl_vec == res );
+}
+
+BOOST_AUTO_TEST_CASE( test_convert_multi_struct )
+{
+    Registry registry;
+    import_types(registry);
+
+    struct B b = { '0', { 100, -23, 'c', 12 } };
+    
+    const Type& t = *registry.get("/B");
+
+    Value v(&b, t);
+
+    VectorToc toc = VectorTocMaker().apply(t);
+    
+    ConvertToVector ctv(toc);
+    
+    std::vector<double> dbl_vec;
+    dbl_vec.push_back(double(b.a));
+    dbl_vec.push_back(double(b.b.a));
+    dbl_vec.push_back(double(b.b.b));
+    dbl_vec.push_back(double(b.b.c));
+    dbl_vec.push_back(double(b.b.d));
+
+    std::vector<double> res = ctv.apply(v);
+
+    BOOST_REQUIRE ( res.size() == dbl_vec.size() );
+
+    for ( int i=0; i<5; i++)
+        std::cout << res[i] << " ?= " << dbl_vec[i] << std::endl;
+
+    BOOST_CHECK( dbl_vec == res );
 
 }
 
