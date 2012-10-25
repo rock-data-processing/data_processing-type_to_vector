@@ -14,6 +14,8 @@
 #ifndef GENERALPROCESSING_VECTORTOCMAKER_HPP
 #define GENERALPROCESSING_VECTORTOCMAKER_HPP
 
+#include <vector>
+
 #include <typelib/typevisitor.hh>
 #include <typelib/typemodel.hh>
 #include <utilmm/stringtools.hh>
@@ -27,7 +29,10 @@ class VectorTocMaker: public Typelib::TypeVisitor {
     
     VectorToc mToc;
     utilmm::stringlist mPlaceStack;
-    unsigned int mPosition;
+    unsigned int mPosition; //!< Position in the data.
+    unsigned int mLastSize;
+    std::vector<unsigned int> mOffsetStack; //!< Last offset in case of a field
+    unsigned int mDelta; //!< Delta between to field offsets
 
     void push_valueinfo(Typelib::Type const& type);
     void push_container(VectorToc* toc_ptr);
