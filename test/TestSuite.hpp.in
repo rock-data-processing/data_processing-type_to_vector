@@ -3,4 +3,8 @@
 
 #define TEST_DATA_PATH(x) "@CMAKE_BINARY_DIR@/test/" x
 
+class Typelib::Registry;
+
+void import_types(Typelib::Registry& registry);
+
 #endif // GENERALPROCESSING_TESTSUIT_HPP

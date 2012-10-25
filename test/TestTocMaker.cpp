@@ -2,8 +2,6 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
-#include <typelib/pluginmanager.hh>
-#include <typelib/importer.hh>
 #include <typelib/typemodel.hh>
 #include <typelib/registry.hh>
 
@@ -17,14 +15,6 @@
 using namespace general_processing;
 using namespace Typelib;
 
-void import_types(Typelib::Registry& registry) {
-
-    static const char* test_file = TEST_DATA_PATH("TestTypes.tlb");
-
-    utilmm::config_set config;
-    PluginManager::self manager;
-    manager->load("tlb", test_file, config, registry);
-}
 
 
 BOOST_AUTO_TEST_CASE ( test_tocmaker_scalar ) {

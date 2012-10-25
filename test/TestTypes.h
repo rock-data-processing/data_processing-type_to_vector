@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 
+enum Count { One, Two, Three };
 
 typedef std::vector<int> IntVec;
 
