@@ -17,11 +17,6 @@
 #include <string>
 #include <vector>
 
-#include <typelib/typemodel.hh>
-#include <typelib/value.hh>
-
-#include <Eigen/Core>
-
 #include "NumericConverter.hpp"
 
 namespace general_processing {
@@ -58,23 +53,10 @@ public:
 struct VectorToc : public std::vector<VectorValueInfo> {
 
     std::string mType; //!< The type the toc is made for.
-    std::string mSlice; //!< Slice operation made and marks a concrete toc.
+    std::string mSlice; //!< Slice operations made and marks a concrete toc.
     int maxDepth; //!< Maximum recursion depth for the visitors.
 
     VectorToc();
-
-    std::vector<double> valueToVector (const Typelib::Value& value);
-    Eigen::VectorXd valueToEigen (const Typelib::Value& value);
-
-    Typelib::Value vectorToValue (const std::vector<double>& vector);
-    Typelib::Value eigenToValue (const Eigen::VectorXd& vector);
-    
-    /** Gives the concret toc for a certain value. 
-     *
-     * The toc is different if containers are part of the type. 
-     * The size for containers is determined and the toc has only one level.
-     * The slice is regarded as well.*/
-    VectorToc concreteToc (const Typelib::Value& value);
 
     void clear();
 

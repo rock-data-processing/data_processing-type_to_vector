@@ -45,36 +45,7 @@ bool VectorValueInfo::operator==(const VectorValueInfo& other ) const {
 }
 
 
-
-
 VectorToc::VectorToc() : mType(""), mSlice(""), maxDepth(100) {}
-
-std::vector<double> VectorToc::valueToVector (const Typelib::Value& value) {
-    std::vector<double> v;
-    return v;
-}
-
-Eigen::VectorXd VectorToc::valueToEigen (const Typelib::Value& value) {
-    std::vector<double> v = valueToVector(value);
-    Eigen::VectorXd eigen_vector = Eigen::Map<Eigen::VectorXd>(&(v[0]), v.size());
-    return eigen_vector;
-}
-
-Typelib::Value VectorToc::vectorToValue (const std::vector<double>& vector) {
-    return Typelib::Value();
-}
-
-Typelib::Value VectorToc::eigenToValue (const Eigen::VectorXd& vector) {
-    std::vector<double> v;
-    v.resize(vector.rows(), 0.0);
-    Eigen::Map<Eigen::VectorXd> m(&(v[0]),vector.rows());
-    m = vector;
-    return vectorToValue(v);
-}
-
-VectorToc VectorToc::concreteToc (const Typelib::Value& value) {
-    return *this;
-}
 
 void VectorToc::clear() {
     mType = "";
