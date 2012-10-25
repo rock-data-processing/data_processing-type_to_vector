@@ -22,7 +22,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& sv) {
     return os;
 }
 
-BOOST_AUTO_TEST_CASE ( test_empty_toc ) {
+BOOST_AUTO_TEST_CASE ( test_toc_empty ) {
     VectorToc toc;
 
     BOOST_CHECK(toc.empty());
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE ( test_empty_toc ) {
     BOOST_CHECK(PlainTocVisitor().apply(toc).empty()); 
 }
 
-BOOST_AUTO_TEST_CASE ( test_single_level ) {
+BOOST_AUTO_TEST_CASE ( test_toc_single_level ) {
 
     std::vector<std::string> plain_toc;
     VectorToc toc;
@@ -93,7 +93,25 @@ BOOST_AUTO_TEST_CASE ( test_single_level ) {
     }
 }
 
-BOOST_AUTO_TEST_CASE ( test_level_two ) {
+BOOST_AUTO_TEST_CASE ( test_toc_container ) {
+    
+    std::vector<std::string> plain_toc;
+    VectorToc toc;
+
+    VectorToc* subtoc = new VectorToc;
+    subtoc->mType = "/SubTest";
+    subtoc->push_back(makeInfo("",0));
+
+    toc.mType = "/Test";
+    toc.push_back(makeInfo("*",0,subtoc));
+    
+    plain_toc.push_back("*");
+
+    BOOST_CHECK( plain_toc == PlainTocVisitor().apply(toc));
+
+}
+
+BOOST_AUTO_TEST_CASE ( test_toc_level_two ) {
     
     std::vector<std::string> plain_toc;
     VectorToc toc;
@@ -106,7 +124,7 @@ BOOST_AUTO_TEST_CASE ( test_level_two ) {
 
     toc.mType = "/Test";
     toc.push_back(makeInfo("a",0));
-    toc.push_back(makeInfo("b",4,subtoc));
+    toc.push_back(makeInfo("b.*",4,subtoc));
     
     plain_toc.push_back("a");
     plain_toc.push_back("b.*.a");
@@ -126,7 +144,7 @@ BOOST_AUTO_TEST_CASE ( test_level_two ) {
 
         toc2.mType = "/Test";
         toc2.push_back(makeInfo("a",0));
-        toc2.push_back(makeInfo("b",4,subtoc));
+        toc2.push_back(makeInfo("b.*",4,subtoc));
 
         BOOST_CHECK ( toc2 == toc );
     }
@@ -142,7 +160,7 @@ BOOST_AUTO_TEST_CASE ( test_level_two ) {
 
         toc2.mType = "/Test";
         toc2.push_back(makeInfo("a",0));
-        toc2.push_back(makeInfo("b",4,subtoc));
+        toc2.push_back(makeInfo("b.*",4,subtoc));
 
         BOOST_CHECK ( toc != toc2 );
     }
@@ -158,7 +176,7 @@ BOOST_AUTO_TEST_CASE ( test_level_two ) {
 
         toc2.mType = "/Test";
         toc2.push_back(makeInfo("a",0));
-        toc2.push_back(makeInfo("b",4,subtoc));
+        toc2.push_back(makeInfo("b.*",4,subtoc));
 
         BOOST_CHECK ( toc != toc2 );
     }
@@ -173,7 +191,7 @@ BOOST_AUTO_TEST_CASE ( test_level_two ) {
 
         toc2.mType = "/Test";
         toc2.push_back(makeInfo("a",0));
-        toc2.push_back(makeInfo("b",4,subtoc));
+        toc2.push_back(makeInfo("b.*",4,subtoc));
 
         BOOST_CHECK ( toc != toc2 );
     }
@@ -189,7 +207,7 @@ BOOST_AUTO_TEST_CASE ( test_level_two ) {
 
         toc2.mType = "/Test";
         toc2.push_back(makeInfo("a",0));
-        toc2.push_back(makeInfo("b",4,subtoc));
+        toc2.push_back(makeInfo("b.*",4,subtoc));
 
         BOOST_CHECK ( toc != toc2 );
     }

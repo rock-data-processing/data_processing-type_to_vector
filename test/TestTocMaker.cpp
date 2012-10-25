@@ -27,7 +27,7 @@ void import_types(Typelib::Registry& registry) {
 }
 
 
-BOOST_AUTO_TEST_CASE ( test_toc_scalar ) {
+BOOST_AUTO_TEST_CASE ( test_tocmaker_scalar ) {
 
     Typelib::Registry registry;
 
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE ( test_toc_scalar ) {
     BOOST_CHECK ( PlainTocVisitor().apply(toc)[0] == "" );
 }
 
-BOOST_AUTO_TEST_CASE ( test_toc_array ) {
+BOOST_AUTO_TEST_CASE ( test_tocmaker_array ) {
 
     Typelib::Registry registry;
 
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE ( test_toc_array ) {
 
 }
 
-BOOST_AUTO_TEST_CASE ( test_toc_struct ) {
+BOOST_AUTO_TEST_CASE ( test_tocmaker_struct ) {
     
     Typelib::Registry registry;
 
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE ( test_toc_struct ) {
     BOOST_CHECK ( utilmm::join(sl) == "a b c d" );
 }
 
-BOOST_AUTO_TEST_CASE ( test_toc_container ) {
+BOOST_AUTO_TEST_CASE ( test_tocmaker_container ) {
 
     Typelib::Registry registry;
 
@@ -139,18 +139,29 @@ BOOST_AUTO_TEST_CASE ( test_toc_container ) {
     BOOST_REQUIRE ( toc.size() == 1 );
     
     BOOST_CHECK ( toc.back().placeDescription == "*");
-    BOOST_REQUIRE ( toc.back().castFun != 0 );
+    BOOST_CHECK ( toc.back().castFun == 0 );
+    BOOST_REQUIRE ( toc.back().content > 0 );
+
+    VectorToc* subtoc = toc.back().content;
+    
+    BOOST_CHECK ( subtoc->mType == "/int32_t" );
+    BOOST_REQUIRE ( subtoc->size() == 1 );
+    
+    BOOST_CHECK ( subtoc->back().content ==  0 );
+    BOOST_CHECK ( subtoc->back().placeDescription == "");
+    BOOST_REQUIRE ( subtoc->back().castFun > 0 );
 
     int val = 23;
-    BOOST_CHECK ( toc.back().castFun(&val) == double(val) );
-    BOOST_CHECK ( toc.back().content == 0 );
+    BOOST_CHECK ( subtoc->back().castFun(&val) == double(val) );
     
     std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
+    BOOST_CHECK ( ptoc.size() == 1 );
+
     utilmm::stringlist sl(ptoc.begin(), ptoc.end());
     BOOST_CHECK ( utilmm::join(sl) == "*" );
 }
 
-BOOST_AUTO_TEST_CASE ( test_toc_string ) {
+BOOST_AUTO_TEST_CASE ( test_tocmaker_string ) {
 
     Typelib::Registry registry;
 
@@ -168,11 +179,20 @@ BOOST_AUTO_TEST_CASE ( test_toc_string ) {
     BOOST_REQUIRE ( toc.size() == 1 );
     
     BOOST_CHECK ( toc.back().placeDescription == "*");
-    BOOST_REQUIRE ( toc.back().castFun != 0 );
+    BOOST_REQUIRE ( toc.back().castFun == 0 );
+    BOOST_REQUIRE ( toc.back().content > 0 );
 
+    VectorToc* subtoc = toc.back().content;
+    
+    BOOST_CHECK ( subtoc->mType == "/int8_t" );
+    BOOST_REQUIRE ( subtoc->size() == 1 );
+    
+    BOOST_CHECK ( subtoc->back().placeDescription == "");
+    BOOST_CHECK ( subtoc->back().content ==  0 );
+    BOOST_REQUIRE ( subtoc->back().castFun > 0 );
+    
     char c = 'a';
-    BOOST_CHECK ( toc.back().castFun(&c) == double(c) );
-    BOOST_CHECK ( toc.back().content == 0 );
+    BOOST_CHECK ( subtoc->back().castFun(&c) == double(c) );
     
     std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
     utilmm::stringlist sl(ptoc.begin(), ptoc.end());
@@ -189,7 +209,7 @@ std::string ContainerContainer = "dbl_vv.*.a dbl_vv.*.dbl_vector.*";
 
 } // plain_toc
 
-BOOST_AUTO_TEST_CASE ( test_toc_advanced ) {
+BOOST_AUTO_TEST_CASE ( test_tocmaker_advanced ) {
     
     Typelib::Registry registry;
 

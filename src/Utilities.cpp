@@ -24,20 +24,20 @@ std::ostream& operator<< (std::ostream& os, const VectorToc& toc) {
 
 
 void PlainTocVisitor::push_place () {
-    mPlainToc.push_back(utilmm::join(mPlaceStack,"."));
+    if (!mPlaceStack.empty())
+        mPlainToc.push_back(utilmm::join(mPlaceStack,"."));
+    else
+        mPlainToc.push_back("");
 }
 
 void PlainTocVisitor::visit ( VectorValueInfo const& info ) {
-    mPlaceStack.push_back(info.placeDescription); 
+
+    if (!info.placeDescription.empty()) mPlaceStack.push_back(info.placeDescription); 
+
     if (!info.content) push_place();
     else VectorTocVisitor::visit(info);
-    mPlaceStack.pop_back();
-}
 
-void PlainTocVisitor::visit ( VectorToc const& toc ) {
-    mPlaceStack.push_back("*");
-    VectorTocVisitor::visit(toc);
-    mPlaceStack.pop_back();
+    if (!info.placeDescription.empty()) mPlaceStack.pop_back();
 }
 
 std::vector<std::string> PlainTocVisitor::apply( VectorToc const& toc ) {

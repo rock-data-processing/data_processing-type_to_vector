@@ -18,6 +18,15 @@ void VectorTocMaker::push_valueinfo(Typelib::Type const& type) {
     mPosition += type.getSize();
 }
 
+void VectorTocMaker::push_container(VectorToc* toc_ptr) {
+    VectorValueInfo info;
+    info.placeDescription = utilmm::join(mPlaceStack,".");
+    info.position = mPosition;
+    info.castFun = 0;
+    info.content = toc_ptr;
+    mToc.push_back(info);
+}
+
 bool VectorTocMaker::visit_ (Typelib::NullType const& type) {
     mPosition += type.getSize();
     return Typelib::TypeVisitor::visit_(type); 
@@ -41,7 +50,7 @@ bool VectorTocMaker::visit_ (Typelib::Pointer const& type) {
 
 bool VectorTocMaker::visit_ (Typelib::Array const& type) {
 
-    for (int i=0; i<type.getDimension(); i++ ) {
+    for (unsigned int i=0; i<type.getDimension(); i++ ) {
         std::stringstream ss;
         ss << i;
         mPlaceStack.push_back(ss.str());
@@ -55,9 +64,17 @@ bool VectorTocMaker::visit_ (Typelib::Array const& type) {
 bool VectorTocMaker::visit_ (Typelib::Container const& type) {
    
     mPlaceStack.push_back("*");
-    bool result = Typelib::TypeVisitor::visit_(type);
+
+    VectorTocMaker vtm;
+    VectorToc toc = vtm.apply(type.getIndirection());
+
+    push_container(new VectorToc(toc)); 
+
+    mPosition += vtm.getPosition();    
+    
     mPlaceStack.pop_back();
-    return result;
+
+    return true;
 }
 
 bool VectorTocMaker::visit_ (Typelib::Compound const& type) { 
@@ -77,7 +94,6 @@ bool VectorTocMaker::visit_ (Typelib::Compound const& type,
 VectorToc VectorTocMaker::apply (Typelib::Type const& type) {
     mToc.clear();
     mToc.mType = type.getName();
-    mTocStack.clear();
     mPlaceStack.clear();
     mPosition = 0;
     Typelib::TypeVisitor::visit_(type); 

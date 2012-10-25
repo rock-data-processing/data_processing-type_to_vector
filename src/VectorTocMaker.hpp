@@ -26,11 +26,11 @@ namespace general_processing {
 class VectorTocMaker: public Typelib::TypeVisitor {
     
     VectorToc mToc;
-    std::vector<VectorToc> mTocStack;
     utilmm::stringlist mPlaceStack;
     unsigned int mPosition;
 
     void push_valueinfo(Typelib::Type const& type);
+    void push_container(VectorToc* toc_ptr);
 
 protected:    
     virtual bool visit_ (Typelib::NullType const& type);
@@ -48,6 +48,7 @@ protected:
 public:
     VectorTocMaker();
     VectorToc apply (Typelib::Type const& type);
+    unsigned int getPosition() { return mPosition; }
 };
 
 } // namespace general_processing

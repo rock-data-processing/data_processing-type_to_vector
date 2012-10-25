@@ -36,7 +36,7 @@ class PlainTocVisitor : public VectorTocVisitor {
 
 protected:
     void visit ( VectorValueInfo const& info );
-    void visit ( VectorToc const& toc );
+    //void visit ( VectorToc const& toc );
 public:
     PlainTocVisitor(int max_depth=-1) : VectorTocVisitor(max_depth) {}
     std::vector<std::string> apply( VectorToc const& toc );
