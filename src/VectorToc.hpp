@@ -32,7 +32,8 @@ struct VectorValueInfo {
     std::string placeDescription; //!< Something like position.3, rotation.im.1 or ...
     unsigned int position; //!< The position in bytes in the memory of this value.
     CastFunction castFun; //!< To cast the value, 0 for container or other type.
-    VectorToc* content; //!< Subcontent (is needed mostly for containers).
+    VectorToc* content; //!< Subcontent (is needed for containers).
+    std::string containerType; //!< Type name of the content aka container.
 
 protected:
     class DeleteVisitor; //!< To also delete recursivly all content.
@@ -59,6 +60,9 @@ struct VectorToc : public std::vector<VectorValueInfo> {
     VectorToc();
 
     void clear();
+
+    /** Checks if the toc has any containers. */
+    bool isFlat();
 
 private:
     class EqualityVisitor;

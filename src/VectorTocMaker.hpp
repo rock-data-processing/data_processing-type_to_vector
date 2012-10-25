@@ -35,7 +35,7 @@ class VectorTocMaker: public Typelib::TypeVisitor {
     unsigned int mDelta; //!< Delta between to field offsets
 
     void push_valueinfo(Typelib::Type const& type);
-    void push_container(VectorToc* toc_ptr);
+    void push_container(Typelib::Type const& type, VectorToc* toc_ptr);
 
 protected:    
     virtual bool visit_ (Typelib::NullType const& type);

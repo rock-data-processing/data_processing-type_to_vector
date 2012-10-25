@@ -53,6 +53,13 @@ void VectorToc::clear() {
     std::vector<VectorValueInfo>::clear();
 }
 
+bool VectorToc::isFlat() {
+    VectorToc::const_iterator it = begin();
+    for ( ; it != end(); it++)
+        if ( it->content ) return false;
+    return true;
+}
+
 
 void VectorTocVisitor::visit(VectorValueInfo const& info) {
     if (info.content) {

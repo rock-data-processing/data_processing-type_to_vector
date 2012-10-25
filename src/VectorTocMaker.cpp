@@ -19,17 +19,22 @@ void VectorTocMaker::push_valueinfo(Typelib::Type const& type) {
     info.position = mPosition;
     info.castFun = getCastFunction(type);
     info.content = 0;
+    info.containerType = "";
     mToc.push_back(info);
 
     mLastSize = type.getSize();
 }
 
-void VectorTocMaker::push_container(VectorToc* toc_ptr) {
+void VectorTocMaker::push_container(Typelib::Type const& type ,VectorToc* toc_ptr ) {
+
     VectorValueInfo info;
+
     info.placeDescription = utilmm::join(mPlaceStack,".");
     info.position = mPosition;
     info.castFun = 0;
     info.content = toc_ptr;
+    info.containerType = type.getName();
+
     mToc.push_back(info);
 }
 
@@ -87,7 +92,7 @@ bool VectorTocMaker::visit_ (Typelib::Container const& type) {
     VectorTocMaker vtm;
     VectorToc toc = vtm.apply(type.getIndirection());
 
-    push_container(new VectorToc(toc)); 
+    push_container(type, new VectorToc(toc)); 
 
     mPosition += vtm.getPosition();    
     

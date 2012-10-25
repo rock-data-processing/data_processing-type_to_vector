@@ -36,6 +36,7 @@ BOOST_AUTO_TEST_CASE ( test_tocmaker_scalar ) {
     double val = 1.4;
     BOOST_CHECK ( toc.back().castFun(&val) == val );
     BOOST_CHECK ( toc.back().content == 0 );
+    BOOST_CHECK ( toc.back().containerType == "" );
     BOOST_CHECK ( PlainTocVisitor().apply(toc).size() == 1 );
     BOOST_CHECK ( PlainTocVisitor().apply(toc)[0] == "" );
 }
@@ -63,6 +64,8 @@ BOOST_AUTO_TEST_CASE ( test_tocmaker_array ) {
         BOOST_CHECK ( toc.at(i).castFun(&val) == val );
         BOOST_CHECK ( toc.at(i).content == 0 );
    }
+   
+   BOOST_CHECK ( toc.isFlat() );
 
    std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
    utilmm::stringlist sl(ptoc.begin(), ptoc.end());
@@ -107,6 +110,8 @@ BOOST_AUTO_TEST_CASE ( test_tocmaker_struct ) {
     short vals = 1<<12;
     BOOST_CHECK ( toc.at(3).castFun(&vals) == double(vals) );
     BOOST_CHECK ( toc.at(3).content == 0 );
+
+    BOOST_CHECK ( toc.isFlat() );
    
     std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
     utilmm::stringlist sl(ptoc.begin(), ptoc.end());
@@ -127,9 +132,12 @@ BOOST_AUTO_TEST_CASE ( test_tocmaker_container ) {
 
     BOOST_CHECK ( toc.mType == "/std/vector</int32_t>" );
     BOOST_REQUIRE ( toc.size() == 1 );
+
+    BOOST_CHECK ( !toc.isFlat() );
     
-    BOOST_CHECK ( toc.back().placeDescription == "*");
+    BOOST_CHECK ( toc.back().placeDescription == "*" );
     BOOST_CHECK ( toc.back().castFun == 0 );
+    BOOST_CHECK ( toc.back().containerType == toc.mType );
     BOOST_REQUIRE ( toc.back().content > 0 );
 
     VectorToc* subtoc = toc.back().content;

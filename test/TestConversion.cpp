@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE( test_convert_scalar )
 
         VectorToc toc = VectorTocMaker().apply(*registry.get("/double")); 
 
-        ConvertToVector ctv(toc);
+        ConvertToVector ctv(toc, registry);
 
         std::vector<double> dbl_vec;
         dbl_vec.push_back(f);
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( test_convert_scalar )
 
         VectorToc toc = VectorTocMaker().apply(*registry.get("/int")); 
 
-        ConvertToVector ctv(toc);
+        ConvertToVector ctv(toc, registry);
 
         std::vector<double> dbl_vec;
         dbl_vec.push_back(i);
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE( test_convert_scalar )
 
         VectorToc toc = VectorTocMaker().apply(*registry.get("/char")); 
 
-        ConvertToVector ctv(toc);
+        ConvertToVector ctv(toc, registry);
 
         std::vector<double> dbl_vec;
         dbl_vec.push_back(c);
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE( test_convert_array )
 
     VectorToc toc = VectorTocMaker().apply(t); 
 
-    ConvertToVector ctv(toc);
+    ConvertToVector ctv(toc, registry);
 
     std::vector<double> dbl_vec;
     for (int i=0; i<3; i++) dbl_vec.push_back(d[i]);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE( test_convert_struct )
 
     VectorToc toc = VectorTocMaker().apply(t);
     
-    ConvertToVector ctv(toc);
+    ConvertToVector ctv(toc, registry);
     
     std::vector<double> dbl_vec;
     dbl_vec.push_back(double(a.a));
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( test_convert_multi_struct )
 
     VectorToc toc = VectorTocMaker().apply(t);
     
-    ConvertToVector ctv(toc);
+    ConvertToVector ctv(toc,registry);
     
     std::vector<double> dbl_vec;
     dbl_vec.push_back(double(b.a));
@@ -140,9 +140,6 @@ BOOST_AUTO_TEST_CASE( test_convert_multi_struct )
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
-    for ( int i=0; i<5; i++)
-        std::cout << res[i] << " ?= " << dbl_vec[i] << std::endl;
-
     BOOST_CHECK( dbl_vec == res );
 
 }
@@ -152,7 +149,30 @@ BOOST_AUTO_TEST_CASE( test_convert_container )
     Registry registry;
     import_types(registry);
 
+    const Type& t = *registry.get("/std/vector</int>");
 
+    std::vector<int> int_vec;
+    int_vec.push_back(-10);
+    int_vec.push_back(22);
+    int_vec.push_back(3);
+
+    Value v(&int_vec, t);
+
+    VectorToc toc = VectorTocMaker().apply(t);
+
+    ConvertToVector ctv(toc,registry);
+    
+    std::vector<double> dbl_vec(int_vec.begin(), int_vec.end());
+
+    std::vector<double> res = ctv.apply(v);
+
+    BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+    for ( int i=0; i < res.size(); i++)
+        std::cout << res[i] << " ?= " << dbl_vec[i] << std::endl;
+
+    BOOST_REQUIRE( res == dbl_vec );
+    
 }
 
 BOOST_AUTO_TEST_CASE( test_convert_advanced )
