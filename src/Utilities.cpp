@@ -6,8 +6,8 @@ using namespace general_processing;
 
 std::ostream& operator<< (std::ostream& os, const VectorValueInfo& info) {
     os << info.placeDescription << ":" << info.position
-        << " (" <<  (long)info.content << ")";
-    if (info.content)
+        << " (" <<  info.content << ")";
+    if (info.content.get())
         os << ">" << info.content->mType;
     return os;
 }
@@ -17,7 +17,7 @@ std::ostream& operator<< (std::ostream& os, const VectorToc& toc) {
     os << toc.mType << ":" << toc.mSlice << "\n";
     for (; it != toc.end(); it++) {
         os << "  " << *it << "\n";
-        if (it->content)
+        if (it->content.get())
             os << *(it->content);
     }
     return os;
@@ -35,7 +35,7 @@ void PlainTocVisitor::visit ( VectorValueInfo const& info ) {
 
     if (!info.placeDescription.empty()) mPlaceStack.push_back(info.placeDescription); 
 
-    if (!info.content) push_place();
+    if (!info.content.get()) push_place();
     else VectorTocVisitor::visit(info);
 
     if (!info.placeDescription.empty()) mPlaceStack.pop_back();
@@ -55,12 +55,12 @@ void EqualityVisitor::visit(VectorValueInfo const& info) {
         return;
     }
 
-    if ( mOtherInfo->content && info.content ) {
-        mOtherStack.push_back(mOtherInfo->content);
+    if ( mOtherInfo->content.get() && info.content.get() ) {
+        mOtherStack.push_back(mOtherInfo->content.get());
         VectorTocVisitor::visit(info);
         mOtherStack.pop_back();
     }
-    else if ( (info.content == 0) != (mOtherInfo->content == 0) ) {
+    else if ( (info.content.get() == 0) != (mOtherInfo->content.get() == 0) ) {
         mEqual = false;
         return;
     }

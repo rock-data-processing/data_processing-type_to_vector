@@ -138,14 +138,14 @@ BOOST_AUTO_TEST_CASE ( test_tocmaker_container ) {
     BOOST_CHECK ( toc.back().placeDescription == "*" );
     BOOST_CHECK ( toc.back().castFun == 0 );
     BOOST_CHECK ( toc.back().containerType == toc.mType );
-    BOOST_REQUIRE ( toc.back().content > 0 );
+    BOOST_REQUIRE ( toc.back().content.get() );
 
-    VectorToc* subtoc = toc.back().content;
+    VectorToc* subtoc = toc.back().content.get();
     
     BOOST_CHECK ( subtoc->mType == "/int32_t" );
     BOOST_REQUIRE ( subtoc->size() == 1 );
     
-    BOOST_CHECK ( subtoc->back().content ==  0 );
+    BOOST_CHECK ( subtoc->back().content.get() ==  0 );
     BOOST_CHECK ( subtoc->back().placeDescription == "");
     BOOST_REQUIRE ( subtoc->back().castFun > 0 );
 
@@ -178,9 +178,9 @@ BOOST_AUTO_TEST_CASE ( test_tocmaker_string ) {
     
     BOOST_CHECK ( toc.back().placeDescription == "*");
     BOOST_REQUIRE ( toc.back().castFun == 0 );
-    BOOST_REQUIRE ( toc.back().content > 0 );
+    BOOST_REQUIRE ( toc.back().content != 0 );
 
-    VectorToc* subtoc = toc.back().content;
+    VectorToc* subtoc = toc.back().content.get();
     
     BOOST_CHECK ( subtoc->mType == "/int8_t" );
     BOOST_REQUIRE ( subtoc->size() == 1 );

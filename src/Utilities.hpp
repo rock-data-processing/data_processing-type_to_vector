@@ -17,6 +17,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+
 #include <utilmm/stringtools.hh>
 #include "VectorToc.hpp"
 

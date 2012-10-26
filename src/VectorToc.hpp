@@ -17,11 +17,14 @@
 #include <string>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
 #include "NumericConverter.hpp"
 
 namespace general_processing {
 
 struct VectorToc;
+typedef boost::shared_ptr<VectorToc> VectorTocPointer;
 
 /** Information to which place in a type a vector value belongs. 
  *
@@ -32,15 +35,11 @@ struct VectorValueInfo {
     std::string placeDescription; //!< Something like position.3, rotation.im.1 or ...
     unsigned int position; //!< The position in bytes in the memory of this value.
     CastFunction castFun; //!< To cast the value, 0 for container or other type.
-    VectorToc* content; //!< Subcontent (is needed for containers).
+    VectorTocPointer content; //!< Subcontent (is needed for containers).
     std::string containerType; //!< Type name of the content aka container.
 
-protected:
-    class DeleteVisitor; //!< To also delete recursivly all content.
- 
 public:
     VectorValueInfo();
-    ~VectorValueInfo();
 
     bool operator== (const VectorValueInfo& other) const;
 };

@@ -225,7 +225,6 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
         Value v(&dv, t);
         
         VectorToc toc = VectorTocMaker().apply(t);
-        std::cout << toc;
 
         ConvertToVector ctv(toc,registry);
         
@@ -302,7 +301,6 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
     }
     
     BOOST_TEST_CHECKPOINT("Going to ContainerContainer");
-    std::cout << "ContainerContainer\n";
 
     {
         const Type& t = *registry.get("/ContainerContainer");
@@ -323,7 +321,6 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
         Value v(&cc, t);
         
         VectorToc toc = VectorTocMaker().apply(t);
-        std::cout << toc;
 
         ConvertToVector ctv(toc,registry);
         

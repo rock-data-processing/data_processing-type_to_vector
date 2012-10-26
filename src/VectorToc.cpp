@@ -6,37 +6,8 @@
 
 using namespace general_processing;
 
-
-class VectorValueInfo::DeleteVisitor : public VectorTocVisitor {
-
-    void visit(VectorValueInfo& info) {
-        VectorTocVisitor::visit(info);
-        if ( info.content ) {
-            delete info.content;
-            info.content = 0;
-        }
-    }
-
-    void visit(VectorToc& toc) {
-        VectorToc::iterator it = toc.begin();
-        for ( ; it<toc.end(); it++)
-            visit(*it);
-    }
-
-public:
-    void apply(VectorToc& toc) { visit(toc); }
-};  // class DeleteVisitor
-
-
 VectorValueInfo::VectorValueInfo() : 
-    placeDescription(""), position(0), castFun(0), content(0) {}
-
-VectorValueInfo::~VectorValueInfo() {
-    if (content) {
-        DeleteVisitor dv;
-        dv.apply(*content);
-    }
-}
+    placeDescription(""), position(0), castFun(0) {}
 
 bool VectorValueInfo::operator==(const VectorValueInfo& other ) const {
     return placeDescription == other.placeDescription &&
@@ -56,13 +27,13 @@ void VectorToc::clear() {
 bool VectorToc::isFlat() {
     VectorToc::const_iterator it = begin();
     for ( ; it != end(); it++)
-        if ( it->content ) return false;
+        if ( it->content.get() ) return false;
     return true;
 }
 
 
 void VectorTocVisitor::visit(VectorValueInfo const& info) {
-    if (info.content) {
+    if (info.content.get()) {
         mDepth++;
         if (mMaxDepth >= 0 && mDepth > mMaxDepth ) 
             throw std::runtime_error("reached maximum recursion depth in VectorTocVistor");

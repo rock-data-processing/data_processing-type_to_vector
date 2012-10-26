@@ -12,7 +12,7 @@ VectorValueInfo makeInfo(const std::string& descr, unsigned int position,
     VectorValueInfo info;
     info.placeDescription = descr;
     info.position = position;
-    info.content = content;
+    info.content = VectorTocPointer(content);
     return info;
 }
 
