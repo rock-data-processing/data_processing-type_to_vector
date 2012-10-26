@@ -404,5 +404,13 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
 
         BOOST_CHECK( utilmm::join(places_list) == places );
 
+        BOOST_TEST_CHECKPOINT("Testing Eigen::VectorXd output");
+
+        Eigen::VectorXd x(dbl_vec.size());
+        for (int i =0; i<dbl_vec.size(); i++)
+            x[i] = dbl_vec[i];
+
+        BOOST_CHECK ( x == ctv.getEigenVector() );
+
     }
 }
