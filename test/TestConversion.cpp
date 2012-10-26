@@ -168,10 +168,33 @@ BOOST_AUTO_TEST_CASE( test_convert_container )
 
     BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
-    for ( int i=0; i < res.size(); i++)
-        std::cout << res[i] << " ?= " << dbl_vec[i] << std::endl;
 
-    BOOST_REQUIRE( res == dbl_vec );
+    BOOST_CHECK( res == dbl_vec );
+    
+}
+
+BOOST_AUTO_TEST_CASE( test_convert_string )
+{
+    Registry registry;
+    import_types(registry);
+
+    const Type& t = *registry.get("/std/string");
+
+    std::string str = "Hello world!";
+
+    Value v(&str, t);
+
+    VectorToc toc = VectorTocMaker().apply(t);
+
+    ConvertToVector ctv(toc,registry);
+    
+    std::vector<double> dbl_vec(str.begin(), str.end());
+
+    std::vector<double> res = ctv.apply(v);
+
+    BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+    BOOST_CHECK( res == dbl_vec );
     
 }
 
@@ -182,7 +205,7 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
 
 }
 
-BOOST_AUTO_TEST_CASE( test_convert_concret_toc )
+BOOST_AUTO_TEST_CASE( test_convert_flat_toc )
 {
     Registry registry;
     import_types(registry);
