@@ -7,7 +7,13 @@
 using namespace general_processing;
 
 void* ConvertToVector::getPosition(const VectorValueInfo& info) {
-    return mBaseStack.back() + info.position + mContainersSize;
+
+    void* ptr = mBaseStack.back() + info.position;
+
+    if (!mContainersSizeStack.empty())
+        ptr += mContainersSizeStack.back();
+
+    return ptr;
 }
 
 void ConvertToVector::visit (const VectorValueInfo& info) {
@@ -17,19 +23,23 @@ void ConvertToVector::visit (const VectorValueInfo& info) {
         const Typelib::Container& t = 
             static_cast<const Typelib::Container&>(*mrRegistry.get(info.containerType));
 
-        unsigned int ecnt = t.getElementCount( getPosition(info) );
+        void* ptr = getPosition(info);
+
+        unsigned int ecnt = t.getElementCount( ptr );
         unsigned int esize = t.getIndirection().getSize();
         std::vector<uint8_t>* vector_ptr = 
-            reinterpret_cast<std::vector<uint8_t>*>(getPosition(info));
+            reinterpret_cast<std::vector<uint8_t>*>( ptr );
         void* base = &(*vector_ptr)[0];
         mBaseStack.push_back(base);
+        mContainersSizeStack.push_back(0);
+
 
         for ( int i=0; i<ecnt; i++) {
-            visit(*(info.content));
-            mContainersSize += esize;
+            VectorTocVisitor::visit(*(info.content));
+            mContainersSizeStack.back() += esize;
         }
 
-        mContainersSize = 0;
+        mContainersSizeStack.pop_back();
         mBaseStack.pop_back();
     }
     else mVector.push_back( info.castFun(getPosition(info)) );
@@ -51,7 +61,7 @@ std::vector<double> ConvertToVector::apply (const Typelib::Value& value,
     mpValue = &value;
     mBaseStack.clear();
     mBaseStack.push_back(mpValue->getData());
-    mContainersSize = 0;
+    mContainersSizeStack.clear();
 
     VectorTocVisitor::visit(mToc);
 

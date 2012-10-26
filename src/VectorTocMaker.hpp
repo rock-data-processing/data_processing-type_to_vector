@@ -53,7 +53,6 @@ protected:
 public:
     VectorTocMaker();
     VectorToc apply (Typelib::Type const& type);
-    unsigned int getPosition() { return mPosition; }
 };
 
 } // namespace general_processing

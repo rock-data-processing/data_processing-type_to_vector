@@ -5,7 +5,8 @@
 using namespace general_processing;
 
 std::ostream& operator<< (std::ostream& os, const VectorValueInfo& info) {
-    os << info.placeDescription << ":" << info.position;
+    os << info.placeDescription << ":" << info.position
+        << " (" <<  (long)info.content << ")";
     if (info.content)
         os << ">" << info.content->mType;
     return os;

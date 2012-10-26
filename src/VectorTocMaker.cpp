@@ -4,6 +4,8 @@
 
 #include "VectorTocMaker.hpp"
 
+#include "Utilities.hpp"
+
 using namespace general_processing;
 
 VectorTocMaker::VectorTocMaker() {}
@@ -26,6 +28,9 @@ void VectorTocMaker::push_valueinfo(Typelib::Type const& type) {
 }
 
 void VectorTocMaker::push_container(Typelib::Type const& type ,VectorToc* toc_ptr ) {
+    
+    if (mDelta) mPosition += mDelta;
+    else mPosition += mLastSize;
 
     VectorValueInfo info;
 
@@ -91,10 +96,11 @@ bool VectorTocMaker::visit_ (Typelib::Container const& type) {
 
     VectorTocMaker vtm;
     VectorToc toc = vtm.apply(type.getIndirection());
+    VectorToc* p_toc = new VectorToc(toc);
 
-    push_container(type, new VectorToc(toc)); 
+    push_container(type, p_toc); 
 
-    mPosition += vtm.getPosition();    
+    mLastSize = type.getSize();    
     
     mPlaceStack.pop_back();
 
@@ -107,6 +113,9 @@ bool VectorTocMaker::visit_ (Typelib::Compound const& type) {
     if (mDelta) {
         mPosition += mDelta;
         mDelta = 0;
+        mLastSize = 0;
+    } else {
+        mPosition += mLastSize;
         mLastSize = 0;
     }
 

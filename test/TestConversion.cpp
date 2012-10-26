@@ -9,6 +9,8 @@
 
 #include "Converter.hpp"
 #include "VectorTocMaker.hpp"
+#include "Utilities.hpp"
+
 #include "TestTypes.h"
 
 using namespace Typelib;
@@ -150,17 +152,26 @@ BOOST_AUTO_TEST_CASE( test_convert_container )
     import_types(registry);
 
     const Type& t = *registry.get("/std/vector</int>");
+    
+    VectorToc toc = VectorTocMaker().apply(t);
+
+    ConvertToVector ctv(toc,registry);
 
     std::vector<int> int_vec;
+
+    {
+        Value v(&int_vec, t);
+    
+        std::vector<double> res = ctv.apply(v);
+
+        BOOST_CHECK( res.empty() );
+    }
+
     int_vec.push_back(-10);
     int_vec.push_back(22);
     int_vec.push_back(3);
 
     Value v(&int_vec, t);
-
-    VectorToc toc = VectorTocMaker().apply(t);
-
-    ConvertToVector ctv(toc,registry);
     
     std::vector<double> dbl_vec(int_vec.begin(), int_vec.end());
 
@@ -202,14 +213,139 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
 {
     Registry registry;
     import_types(registry);
+    
+    {
+        const Type& t = *registry.get("/DoubleVector");
+        
+        DoubleVector dv;
+        dv.a = 23;
+        dv.dbl_vector.push_back(-123456.789);
+        dv.dbl_vector.push_back(1.4);
 
+        Value v(&dv, t);
+        
+        VectorToc toc = VectorTocMaker().apply(t);
+        std::cout << toc;
+
+        ConvertToVector ctv(toc,registry);
+        
+        std::vector<double> dbl_vec;
+        dbl_vec.push_back(double(dv.a));
+        for (int i=0; i<dv.dbl_vector.size(); i++)
+            dbl_vec.push_back(double(dv.dbl_vector[i]));
+    
+        std::vector<double> res = ctv.apply(v);
+
+        BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+        BOOST_CHECK( res == dbl_vec );
+    }
+
+    BOOST_TEST_CHECKPOINT("Going to VectorArray");
+
+    {
+        const Type& t = *registry.get("/VectorArray");
+        
+        VectorArray va;
+        va.dbl_vector_array[0].push_back(12.0);
+        va.dbl_vector_array[2].push_back(-123456.789);
+        va.dbl_vector_array[2].push_back(1.4);
+
+        Value v(&va, t);
+        
+        VectorToc toc = VectorTocMaker().apply(t);
+
+        ConvertToVector ctv(toc,registry);
+        
+        std::vector<double> dbl_vec;
+        for (int j=0; j<3; j++)
+            for (int i=0; i<va.dbl_vector_array[j].size(); i++)
+                dbl_vec.push_back(va.dbl_vector_array[j][i]);
+    
+        std::vector<double> res = ctv.apply(v);
+
+        BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+        BOOST_CHECK( res == dbl_vec );
+    }
+    
+    BOOST_TEST_CHECKPOINT("Going to StructArray");
+
+    {
+        const Type& t = *registry.get("/StructArray");
+        
+        StructArray sa;
+        struct A a = { 10, -23, 51, 112 };
+        struct A b = { -12452134, 12, 33, -1 };
+        sa.A_vector.push_back(a);
+        sa.A_vector.push_back(b);
+
+        Value v(&sa, t);
+        
+        VectorToc toc = VectorTocMaker().apply(t);
+
+        ConvertToVector ctv(toc,registry);
+        
+        std::vector<double> dbl_vec;
+        for (int i=0; i<sa.A_vector.size(); i++) {
+            dbl_vec.push_back(sa.A_vector[i].a);
+            dbl_vec.push_back(sa.A_vector[i].b);
+            dbl_vec.push_back(sa.A_vector[i].c);
+            dbl_vec.push_back(sa.A_vector[i].d);
+        }
+    
+        std::vector<double> res = ctv.apply(v);
+
+        BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+        BOOST_CHECK( res == dbl_vec );
+    }
+    
+    BOOST_TEST_CHECKPOINT("Going to ContainerContainer");
+    std::cout << "ContainerContainer\n";
+
+    {
+        const Type& t = *registry.get("/ContainerContainer");
+        
+        ContainerContainer cc;
+        DoubleVector dv;
+        dv.a = 10;
+        dv.dbl_vector.push_back(12.2);
+        cc.dbl_vv.push_back(dv);
+        dv.a = -23;
+        dv.dbl_vector.push_back(23.0);
+        dv.dbl_vector.push_back(-142.2);
+        cc.dbl_vv.push_back(dv);
+        dv.a = 0;
+        dv.dbl_vector.pop_back();
+        cc.dbl_vv.push_back(dv);
+
+        Value v(&cc, t);
+        
+        VectorToc toc = VectorTocMaker().apply(t);
+        std::cout << toc;
+
+        ConvertToVector ctv(toc,registry);
+        
+        std::vector<double> dbl_vec;
+        for (int i=0; i<cc.dbl_vv.size(); i++) {
+            dbl_vec.push_back(cc.dbl_vv[i].a);
+            for (int j=0; j<cc.dbl_vv[i].dbl_vector.size(); j++ )
+                dbl_vec.push_back(cc.dbl_vv[i].dbl_vector[j]);
+        }
+    
+        std::vector<double> res = ctv.apply(v);
+
+        BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+        BOOST_CHECK( res == dbl_vec );
+    }
 }
 
 BOOST_AUTO_TEST_CASE( test_convert_flat_toc )
 {
     Registry registry;
     import_types(registry);
-
 }
 
 

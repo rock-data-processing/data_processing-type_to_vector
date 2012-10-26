@@ -43,7 +43,7 @@ class ConvertToVector : public VectorTocVisitor {
 
     const Typelib::Value* mpValue;
     std::vector<void*> mBaseStack;
-    int mContainersSize;
+    std::vector<int> mContainersSizeStack;
     
     std::string mSlice;
 
