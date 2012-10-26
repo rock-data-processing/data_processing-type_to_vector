@@ -5,6 +5,8 @@
 #include <typelib/typemodel.hh>
 #include <typelib/registry.hh>
 
+#include <utilmm/stringtools.hh>
+
 #include "TestSuite.hpp"
 
 #include "Converter.hpp"
@@ -33,6 +35,15 @@ BOOST_AUTO_TEST_CASE( test_convert_scalar )
         dbl_vec.push_back(f);
 
         BOOST_CHECK( dbl_vec == ctv.apply(v) );
+        
+        BOOST_TEST_CHECKPOINT("Testing double places");
+
+        std::string places = "";
+
+        std::vector<std::string> places_res = ctv.getPlaceVector();
+        utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+        BOOST_CHECK( utilmm::join(places_list) == places );
     }
 
     {
@@ -85,6 +96,15 @@ BOOST_AUTO_TEST_CASE( test_convert_array )
     for (int i=0; i<3; i++) dbl_vec.push_back(d[i]);
 
     BOOST_CHECK( dbl_vec == ctv.apply(v) );
+        
+    BOOST_TEST_CHECKPOINT("Testing double[3] places");
+
+    std::string places = "0 1 2";
+
+    std::vector<std::string> places_res = ctv.getPlaceVector();
+    utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+    BOOST_CHECK( utilmm::join(places_list) == places );
 
 }
 
@@ -114,6 +134,15 @@ BOOST_AUTO_TEST_CASE( test_convert_struct )
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
     BOOST_CHECK( dbl_vec == res );
+    
+    BOOST_TEST_CHECKPOINT("Testing struct A places");
+
+    std::string places = "a b c d";
+
+    std::vector<std::string> places_res = ctv.getPlaceVector();
+    utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+    BOOST_CHECK( utilmm::join(places_list) == places );
 }
 
 BOOST_AUTO_TEST_CASE( test_convert_multi_struct )
@@ -143,6 +172,15 @@ BOOST_AUTO_TEST_CASE( test_convert_multi_struct )
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
     BOOST_CHECK( dbl_vec == res );
+    
+    BOOST_TEST_CHECKPOINT("Testing struct B places");
+
+    std::string places = "a b.a b.b b.c b.d";
+
+    std::vector<std::string> places_res = ctv.getPlaceVector();
+    utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+    BOOST_CHECK( utilmm::join(places_list) == places );
 
 }
 
@@ -178,7 +216,6 @@ BOOST_AUTO_TEST_CASE( test_convert_container )
     std::vector<double> res = ctv.apply(v);
 
     BOOST_REQUIRE( res.size() == dbl_vec.size() );
-
 
     BOOST_CHECK( res == dbl_vec );
     
@@ -266,6 +303,18 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
         BOOST_CHECK( res == dbl_vec );
+        
+        BOOST_TEST_CHECKPOINT("Testing VectorArray places");
+
+        std::string places = 
+            "dbl_vector_array.0.0 "
+            "dbl_vector_array.2.0 "
+            "dbl_vector_array.2.1";
+
+        std::vector<std::string> places_res = ctv.getPlaceVector();
+        utilmm::stringlist places_list(places_res.begin(), places_res.end()); 
+        
+        BOOST_CHECK( utilmm::join(places_list) == places );
     }
     
     BOOST_TEST_CHECKPOINT("Going to StructArray");
@@ -330,20 +379,30 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
             for (int j=0; j<cc.dbl_vv[i].dbl_vector.size(); j++ )
                 dbl_vec.push_back(cc.dbl_vv[i].dbl_vector[j]);
         }
-    
+
         std::vector<double> res = ctv.apply(v);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
         BOOST_CHECK( res == dbl_vec );
+
+        BOOST_TEST_CHECKPOINT("Testing ContainerContainer places");
+
+        std::string places = 
+            "dbl_vv.0.a "
+            "dbl_vv.0.dbl_vector.0 "
+            "dbl_vv.1.a "
+            "dbl_vv.1.dbl_vector.0 "
+            "dbl_vv.1.dbl_vector.1 "
+            "dbl_vv.1.dbl_vector.2 "
+            "dbl_vv.2.a "
+            "dbl_vv.2.dbl_vector.0 "
+            "dbl_vv.2.dbl_vector.1";
+
+        std::vector<std::string> places_res = ctv.getPlaceVector();
+        utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+        BOOST_CHECK( utilmm::join(places_list) == places );
+
     }
 }
-
-BOOST_AUTO_TEST_CASE( test_convert_flat_toc )
-{
-    Registry registry;
-    import_types(registry);
-}
-
-
-

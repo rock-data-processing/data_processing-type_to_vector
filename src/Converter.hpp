@@ -14,9 +14,9 @@
 #ifndef GENERALPROCESSING_CONVERTER_HPP
 #define GENERALPROCESSING_CONVERTER_HPP
 
-#include <typelib/value.hh>
-
 #include <Eigen/Core>
+#include <typelib/value.hh>
+#include <utilmm/stringtools.hh>
 
 #include "VectorToc.hpp"
 
@@ -36,7 +36,7 @@ class ConvertToVector : public VectorTocVisitor {
 
     const Typelib::Registry& mrRegistry;
 
-    std::vector<std::string> mFlatToc;
+    std::vector<std::string> mPlaceVector;
     std::vector<double> mVector;
 
     const VectorToc&  mToc;
@@ -44,14 +44,16 @@ class ConvertToVector : public VectorTocVisitor {
     const Typelib::Value* mpValue;
     std::vector<void*> mBaseStack;
     std::vector<int> mContainersSizeStack;
+    utilmm::stringlist mPlaceStack; 
     
     std::string mSlice;
 
-    void* getPosition(const VectorValueInfo& info); 
+    void* getPosition (const VectorValueInfo& info); 
+
+    void push_element (const VectorValueInfo& info);
 
 protected:
     void visit (const VectorValueInfo& info);
-    void visit (const VectorToc& toc);
 
 public:
     /** Construction of the converter.
@@ -67,10 +69,10 @@ public:
     
     Eigen::VectorXd getEigenVector ();
     
-    /** Returns the flat toc that describes what the vector actually contains. 
+    /** Returns a vector of string that describes what the conversion results actually contains. 
      *
      * Each entry gives the place in the type for the vector element at this index.*/
-    std::vector<std::string> getFlatToc () { return mFlatToc; }
+    std::vector<std::string> getPlaceVector () { return mPlaceVector; }
 };
 
 } // namespace general_processing
