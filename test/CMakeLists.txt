@@ -12,8 +12,15 @@ include_directories(${CMAKE_BINARY_DIR}/test)
 configure_file(create_tlb.rb.in ${CMAKE_BINARY_DIR}/test/create_tlb.rb)
 configure_file(TestSuite.hpp.in ${CMAKE_BINARY_DIR}/test/TestSuite.hpp)
 
+set(TESTFILES   TestSuite.cpp 
+                TestToc.cpp 
+                TestTocMaker.cpp 
+                TestConversion.cpp 
+                TestSlice.cpp
+)
+
 rock_executable( general_processing_test
-    SOURCES TestSuite.cpp TestToc.cpp TestTocMaker.cpp TestConversion.cpp
+    SOURCES ${TESTFILES}
     DEPS general_processing
     DEPS_CMAKE Boost
     NOINSTALL)

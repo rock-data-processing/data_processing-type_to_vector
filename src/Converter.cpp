@@ -1,6 +1,7 @@
 // \file  Converter.cpp
 
-#include <sstream>
+#include <stdexcept>
+#include <boost/lexical_cast.hpp>
 #include <typelib/registry.hh>
 
 #include "Converter.hpp"
@@ -21,11 +22,14 @@ void ConvertToVector::push_element (const VectorValueInfo& info) {
 
     mVector.push_back( info.castFun(getPosition(info)) );
 
-    if (info.placeDescription != "" ) mPlaceStack.push_back(info.placeDescription);
+    if (mCreatePlaceVector) {
 
-    mPlaceVector.push_back(utilmm::join(mPlaceStack,"."));
+        if (info.placeDescription != "" ) mPlaceStack.push_back(info.placeDescription);
 
-    if (info.placeDescription != "" ) mPlaceStack.pop_back();
+        mPlaceVector.push_back(utilmm::join(mPlaceStack,"."));
+
+        if (info.placeDescription != "" ) mPlaceStack.pop_back();
+    }
 }
 
 void ConvertToVector::visit (const VectorValueInfo& info) {
@@ -49,22 +53,29 @@ void ConvertToVector::visit (const VectorValueInfo& info) {
 
         mBaseStack.push_back(base);
         mContainersSizeStack.push_back(0);
-        mPlaceStack.push_back(info.placeDescription);
-        int istar = mPlaceStack.back().size()-1;
+
+        int istar;
+        
+        if (mCreatePlaceVector) {
+            mPlaceStack.push_back(info.placeDescription);
+            istar = mPlaceStack.back().size()-1;
+        }
 
         for ( int i=0; i<ecnt; i++) {
 
-            std::stringstream ss;
-            ss << i;
-            mPlaceStack.back().replace(mPlaceStack.back().begin()+istar, 
-                    mPlaceStack.back().end(), ss.str());
+            if (mCreatePlaceVector) {
+
+                mPlaceStack.back().replace(mPlaceStack.back().begin()+istar, 
+                        mPlaceStack.back().end(), 
+                        boost::lexical_cast<std::string,int>(i) );
+            }
 
             VectorTocVisitor::visit(*(info.content));
             mContainersSizeStack.back() += esize;
         }
 
         mContainersSizeStack.pop_back();
-        mPlaceStack.pop_back();
+        if (mCreatePlaceVector) mPlaceStack.pop_back();
         mBaseStack.pop_back();
     }
     else push_element(info);
@@ -74,12 +85,18 @@ ConvertToVector::ConvertToVector (const VectorToc& toc, const Typelib::Registry&
     mToc(toc), mrRegistry(registry) {}
 
 std::vector<double> ConvertToVector::apply (const Typelib::Value& value, 
-        const std::string& slice) {
+        const std::string& slice, bool create_place_vector ) {
 
     mVector.clear();
     mPlaceVector.clear();
+
     mSlice = slice;
+
+    if (!create_place_vector) mCreatePlaceVector = slice != "";
+    else mCreatePlaceVector = true;
+
     mpValue = &value;
+
     mBaseStack.clear();
     mBaseStack.push_back(mpValue->getData());
     mContainersSizeStack.clear();
@@ -89,6 +106,17 @@ std::vector<double> ConvertToVector::apply (const Typelib::Value& value,
 
     return mVector;
 
+}
+    
+std::vector<double> ConvertToVector::apply ( const Typelib::Value& value, 
+    bool create_place_vector) {
+
+    return apply(value,"",create_place_vector);
+}
+
+std::vector<double> ConvertToVector::apply ( const Typelib::Value& value ) {
+
+    return apply(value,"",true);
 }
 
 Eigen::VectorXd ConvertToVector::getEigenVector () {

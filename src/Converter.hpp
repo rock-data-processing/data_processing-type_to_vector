@@ -18,11 +18,14 @@
 #include <typelib/value.hh>
 #include <utilmm/stringtools.hh>
 
+#include "Definitions.hpp"
 #include "VectorToc.hpp"
+
 
 class Typelib::Registry;
 
 namespace general_processing {
+
 
 /** Converts a \c Typelib::Value to a vector according to a \c VectorToc. 
  *
@@ -36,7 +39,8 @@ class ConvertToVector : public VectorTocVisitor {
 
     const Typelib::Registry& mrRegistry;
 
-    std::vector<std::string> mPlaceVector;
+    bool mCreatePlaceVector;
+    StringVector mPlaceVector;
     std::vector<double> mVector;
 
     const VectorToc&  mToc;
@@ -44,7 +48,7 @@ class ConvertToVector : public VectorTocVisitor {
     const Typelib::Value* mpValue;
     std::vector<void*> mBaseStack;
     std::vector<int> mContainersSizeStack;
-    utilmm::stringlist mPlaceStack; 
+    utilmm::stringlist mPlaceStack;
     
     std::string mSlice;
 
@@ -65,14 +69,21 @@ public:
     ConvertToVector ( const VectorToc& toc, const Typelib::Registry& registry);
     
     /** Applies the visitor to a value. */
-    std::vector<double> apply (const Typelib::Value& value, const std::string& slice ="");
+    std::vector<double> apply ( const Typelib::Value& value,
+                                const std::string& slice,
+                                bool create_place_vector = true);
+
+    std::vector<double> apply ( const Typelib::Value& value, 
+                                bool create_place_vector);
+    
+    std::vector<double> apply ( const Typelib::Value& value ); 
     
     Eigen::VectorXd getEigenVector ();
     
     /** Returns a vector of string that describes what the conversion results actually contains. 
      *
      * Each entry gives the place in the type for the vector element at this index.*/
-    std::vector<std::string> getPlaceVector () { return mPlaceVector; }
+    StringVector getPlaceVector () { return mPlaceVector; }
 };
 
 } // namespace general_processing

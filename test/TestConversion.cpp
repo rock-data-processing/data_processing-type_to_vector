@@ -403,6 +403,11 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
         utilmm::stringlist places_list(places_res.begin(), places_res.end());
 
         BOOST_CHECK( utilmm::join(places_list) == places );
+        
+        ctv.apply(v, false);
+
+        BOOST_CHECK( ctv.getPlaceVector().empty() );
+
 
         BOOST_TEST_CHECKPOINT("Testing Eigen::VectorXd output");
 
