@@ -1,5 +1,7 @@
 // \file  SliceMatcher.cpp
 
+#include <boost/lexical_cast.hpp>
+
 #include "SliceMatcher.hpp"
 
 using namespace general_processing;
@@ -176,12 +178,65 @@ utilmm::stringlist SliceStore::replaceIndicesSlices(const std::string& str,
 
 
 bool SliceMatcher::fitsASlice (const std::string& place) {
+
+    StringVector places = createGeneralPlaces(place);
+    StringVector slices = mSlices.getPlaces();
+
+    if ( slices.empty() ) return true;
+
+    StringVector::const_iterator it_places = places.begin();
+
+    for ( ; it_places != places.end(); it_places++ ) {
+        
+        StringVector::const_iterator it_slices = slices.begin();
+
+        for ( ; it_slices != slices.end(); it_slices++ )
+
+            if ( startswith(*it_places, *it_slices) ) return true;
+    }
+
     return false;
 }
 
-StringVector SliceMatcher::createGeneralPlaces (const std::string& place) {
+StringVector SliceMatcher::createGeneralPlaces (const std::string& place, size_t start) {
 
-    return StringVector();
+    StringVector result;
+    result.push_back(place);
+
+    size_t from = start;
+
+    while (from < place.length()) {
+        
+        size_t to = place.find(".", from);
+
+        if ( to == std::string::npos ) to = place.length();
+
+        if ( isInteger(place.substr(from,to-from)) ) {
+
+            std::string star_place(place);
+            star_place.replace(from,to-from,"*"); 
+
+            StringVector places = createGeneralPlaces(place, to+1);
+            StringVector places_star = createGeneralPlaces(star_place, from+2);
+
+            for ( StringVector::const_iterator it = places.begin()+1;
+                    it != places.end(); it++)
+
+                result.push_back(*it);
+           
+
+            for ( StringVector::const_iterator it = places_star.begin(); 
+                    it != places_star.end(); it++ )
+
+                result.push_back(*it);
+            
+            return result;
+        } 
+
+        from = to+1;
+    }
+
+    return result;
 }
 
 
@@ -194,3 +249,18 @@ bool SliceMatcher::startswith (const std::string& str, const std::string& start)
 
     return true;
 }
+    
+bool SliceMatcher::isInteger (const std::string& str) {
+
+    try {
+
+        boost::lexical_cast<int>(str);
+
+        return true;
+
+    } catch (boost::bad_lexical_cast&) {}
+
+    return false;
+}
+
+

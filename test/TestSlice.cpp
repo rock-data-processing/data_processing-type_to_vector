@@ -258,6 +258,70 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
 }
 
 BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
+
+    BOOST_TEST_CHECKPOINT("general places");
+    
+    {
+        StringVector res = SliceMatcher::createGeneralPlaces("");
+        
+        StringVector ref;
+        ref.push_back("");
+
+        BOOST_CHECK( res == ref );
+    }
+    
+    {
+        StringVector res = SliceMatcher::createGeneralPlaces("a");
+        
+        StringVector ref;
+        ref.push_back("a");
+
+        BOOST_CHECK( res == ref );
+    }
+    
+    {
+        StringVector res = SliceMatcher::createGeneralPlaces("1");
+        
+        StringVector ref;
+        ref.push_back("1");
+        ref.push_back("*");
+
+        BOOST_CHECK( res == ref );
+    }
+    
+    {
+        StringVector res = SliceMatcher::createGeneralPlaces("a.3");
+        
+        StringVector ref;
+        ref.push_back("a.3");
+        ref.push_back("a.*");
+
+        BOOST_CHECK( res == ref );
+    }
+    
+    {
+        StringVector res = SliceMatcher::createGeneralPlaces("a.12.b");
+        
+        StringVector ref;
+        ref.push_back("a.12.b");
+        ref.push_back("a.*.b");
+        
+        BOOST_CHECK( res == ref );
+    }
+    
+    {
+        StringVector res = SliceMatcher::createGeneralPlaces("a.12.b.3");
+        
+        StringVector ref;
+        ref.push_back("a.12.b.3");
+        ref.push_back("a.12.b.*");
+        ref.push_back("a.*.b.3");
+        ref.push_back("a.*.b.*");
+
+        BOOST_CHECK( res == ref );
+    }
+
+    BOOST_TEST_CHECKPOINT("fits a slice");
     
     { 
         SliceMatcher s(""); 

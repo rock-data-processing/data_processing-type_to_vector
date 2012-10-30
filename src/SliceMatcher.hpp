@@ -103,7 +103,7 @@ public:
             IntSet& star_toks);
 };
 
-
+/** The slice matcher checks whether a place description fits one of its slices. */
 class SliceMatcher {
 
     SliceStore mSlices;
@@ -118,9 +118,11 @@ public:
     const SliceStore& getSlices() const { return mSlices; }
 
     /** For numeric tokens a string with a * instead is add, plus the combinations. */
-    static StringVector createGeneralPlaces (const std::string& place);
+    static StringVector createGeneralPlaces (const std::string& place, size_t start=0);
 
     static bool startswith (const std::string& str, const std::string& start);
+
+    static bool isInteger (const std::string& str);
 
 };
 
