@@ -4,6 +4,8 @@
 #include <boost/lexical_cast.hpp>
 #include <typelib/registry.hh>
 
+#include "SliceMatcher.hpp"
+
 #include "Converter.hpp"
 
 using namespace general_processing;
@@ -20,16 +22,24 @@ void* ConvertToVector::getPosition (const VectorValueInfo& info) {
 
 void ConvertToVector::push_element (const VectorValueInfo& info) {
 
-    mVector.push_back( info.castFun(getPosition(info)) );
-
-    if (mCreatePlaceVector) {
+    bool push_this = true;
+    
+    if (mCreatePlaceVector || mpMatcher ) {
 
         if (info.placeDescription != "" ) mPlaceStack.push_back(info.placeDescription);
 
-        mPlaceVector.push_back(utilmm::join(mPlaceStack,"."));
+        std::string this_place = utilmm::join(mPlaceStack,".");
+
+        if ( mpMatcher && !mpMatcher->fitsASlice(this_place) )
+            push_this = false;
+
+        if (mCreatePlaceVector && push_this) mPlaceVector.push_back(this_place);
 
         if (info.placeDescription != "" ) mPlaceStack.pop_back();
     }
+
+    if (push_this) mVector.push_back( info.castFun(getPosition(info)) );
+
 }
 
 void ConvertToVector::visit (const VectorValueInfo& info) {
@@ -56,14 +66,14 @@ void ConvertToVector::visit (const VectorValueInfo& info) {
 
         int istar;
         
-        if (mCreatePlaceVector) {
+        if (mCreatePlaceVector || mpMatcher ) {
             mPlaceStack.push_back(info.placeDescription);
             istar = mPlaceStack.back().size()-1;
         }
 
         for ( int i=0; i<ecnt; i++) {
 
-            if (mCreatePlaceVector) {
+            if (mCreatePlaceVector || mpMatcher ) {
 
                 mPlaceStack.back().replace(mPlaceStack.back().begin()+istar, 
                         mPlaceStack.back().end(), 
@@ -75,25 +85,25 @@ void ConvertToVector::visit (const VectorValueInfo& info) {
         }
 
         mContainersSizeStack.pop_back();
-        if (mCreatePlaceVector) mPlaceStack.pop_back();
+        if (mCreatePlaceVector || mpMatcher ) mPlaceStack.pop_back();
         mBaseStack.pop_back();
     }
     else push_element(info);
 }
 
 ConvertToVector::ConvertToVector (const VectorToc& toc, const Typelib::Registry& registry) : 
-    mToc(toc), mrRegistry(registry) {}
+    mToc(toc), mrRegistry(registry), mpMatcher(0) {}
 
-std::vector<double> ConvertToVector::apply (const Typelib::Value& value, 
-        const std::string& slice, bool create_place_vector ) {
+ConvertToVector::~ConvertToVector () {
+    delete mpMatcher;
+}
+
+std::vector<double> ConvertToVector::apply (const Typelib::Value& value, bool create_place_vector ) {
 
     mVector.clear();
     mPlaceVector.clear();
 
-    mSlice = slice;
-
-    if (!create_place_vector) mCreatePlaceVector = slice != "";
-    else mCreatePlaceVector = true;
+    mCreatePlaceVector = create_place_vector;
 
     mpValue = &value;
 
@@ -108,17 +118,6 @@ std::vector<double> ConvertToVector::apply (const Typelib::Value& value,
 
 }
     
-std::vector<double> ConvertToVector::apply ( const Typelib::Value& value, 
-    bool create_place_vector) {
-
-    return apply(value,"",create_place_vector);
-}
-
-std::vector<double> ConvertToVector::apply ( const Typelib::Value& value ) {
-
-    return apply(value,"",true);
-}
-
 Eigen::VectorXd ConvertToVector::getEigenVector () {
     Eigen::VectorXd result;
 
@@ -126,4 +125,14 @@ Eigen::VectorXd ConvertToVector::getEigenVector () {
         result = Eigen::Map<Eigen::VectorXd>(&(mVector[0]), mVector.size());
 
     return result;
+}
+
+void ConvertToVector::setSlice (const std::string& slice) {
+
+    if ( mpMatcher ) {
+        delete mpMatcher;
+        mpMatcher = 0;
+    }
+
+    if (slice != "") mpMatcher = new SliceMatcher(slice);
 }

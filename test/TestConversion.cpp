@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE( test_convert_array )
     std::vector<double> dbl_vec;
     for (int i=0; i<3; i++) dbl_vec.push_back(d[i]);
 
-    BOOST_CHECK( dbl_vec == ctv.apply(v) );
+    BOOST_CHECK( dbl_vec == ctv.apply(v, true) );
         
     BOOST_TEST_CHECKPOINT("Testing double[3] places");
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE( test_convert_struct )
     dbl_vec.push_back(double(a.c));
     dbl_vec.push_back(double(a.d));
 
-    std::vector<double> res = ctv.apply(v);
+    std::vector<double> res = ctv.apply(v, true);
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE( test_convert_multi_struct )
     dbl_vec.push_back(double(b.b.c));
     dbl_vec.push_back(double(b.b.d));
 
-    std::vector<double> res = ctv.apply(v);
+    std::vector<double> res = ctv.apply(v, true);
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
             for (int i=0; i<va.dbl_vector_array[j].size(); i++)
                 dbl_vec.push_back(va.dbl_vector_array[j][i]);
     
-        std::vector<double> res = ctv.apply(v);
+        std::vector<double> res = ctv.apply(v, true);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
                 dbl_vec.push_back(cc.dbl_vv[i].dbl_vector[j]);
         }
 
-        std::vector<double> res = ctv.apply(v);
+        std::vector<double> res = ctv.apply(v, true);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -418,4 +418,217 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
         BOOST_CHECK ( x == ctv.getEigenVector() );
 
     }
+}
+
+BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {
+        
+    Registry registry;
+    import_types(registry);
+
+    BOOST_TEST_CHECKPOINT("single index");
+    
+    {
+        registry.build("/double[3]");
+        const Type& t = *registry.get("/double[3]");
+
+        double d[] = { 1.4, -123.2, 54.8 };
+     
+        Value v(&d, t);
+
+        VectorToc toc = VectorTocMaker().apply(t); 
+
+        ConvertToVector ctv(toc, registry);
+
+        std::vector<double> dbl_vec;
+        dbl_vec.push_back(d[1]);
+
+        ctv.setSlice("1");
+
+        BOOST_CHECK( dbl_vec == ctv.apply(v, true) );
+            
+        std::string places = "1";
+
+        std::vector<std::string> places_res = ctv.getPlaceVector();
+        utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+        BOOST_CHECK( utilmm::join(places_list) == places );
+    }
+    
+    BOOST_TEST_CHECKPOINT("index slice");
+    
+    {
+        registry.build("/double[20]");
+        const Type& t = *registry.get("/double[20]");
+
+        double d[20], val = -2.0;
+
+        for ( int i=0; i<20; i++, val+=0.6 )
+            d[i] = val;
+     
+        Value v(&d, t);
+
+        VectorToc toc = VectorTocMaker().apply(t); 
+
+        ConvertToVector ctv(toc, registry);
+        
+        ctv.setSlice("[1,12,13-17:2]");
+
+        std::vector<double> dbl_vec;
+        dbl_vec.push_back(d[1]);
+        dbl_vec.push_back(d[12]);
+        dbl_vec.push_back(d[13]);
+        dbl_vec.push_back(d[15]);
+        dbl_vec.push_back(d[17]);
+
+        BOOST_CHECK( dbl_vec == ctv.apply(v, true) );
+            
+        std::string places = "1 12 13 15 17";
+
+        std::vector<std::string> places_res = ctv.getPlaceVector();
+        utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+        BOOST_CHECK( utilmm::join(places_list) == places );
+    }
+
+    BOOST_TEST_CHECKPOINT ( "sliced structure" );
+    {
+        struct B b = { '0', { 100, -23, 'c', 12 } };
+        
+        const Type& t = *registry.get("/B");
+
+        Value v(&b, t);
+
+        VectorToc toc = VectorTocMaker().apply(t);
+        
+        ConvertToVector ctv(toc,registry);
+        ctv.setSlice("a b.a b.c");
+        
+        std::vector<double> dbl_vec;
+        dbl_vec.push_back(double(b.a));
+        dbl_vec.push_back(double(b.b.a));
+        dbl_vec.push_back(double(b.b.c));
+
+        std::vector<double> res = ctv.apply(v, true);
+
+        BOOST_REQUIRE ( res.size() == dbl_vec.size() );
+
+        BOOST_CHECK( dbl_vec == res );
+        
+        BOOST_TEST_CHECKPOINT("Testing struct B places");
+
+        std::string places = "a b.a b.c";
+
+        std::vector<std::string> places_res = ctv.getPlaceVector();
+        utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+        BOOST_CHECK( utilmm::join(places_list) == places );
+    }
+
+    BOOST_TEST_CHECKPOINT ( "sliced string" );
+    {
+        const Type& t = *registry.get("/std/string");
+                        
+                        // 012345678901
+        std::string str = "Hello world!";
+
+        Value v(&str, t);
+
+        VectorToc toc = VectorTocMaker().apply(t);
+
+        ConvertToVector ctv(toc,registry);
+        ctv.setSlice("[0,6-10]");
+        
+        std::vector<double> dbl_vec;
+        dbl_vec.push_back(double(str[0]));
+        dbl_vec.push_back(double(str[6]));
+        dbl_vec.push_back(double(str[7]));
+        dbl_vec.push_back(double(str[8]));
+        dbl_vec.push_back(double(str[9]));
+        dbl_vec.push_back(double(str[10]));
+
+        std::vector<double> res = ctv.apply(v);
+
+        BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+        BOOST_CHECK( res == dbl_vec ); 
+    }
+    
+    BOOST_TEST_CHECKPOINT("sliced StructArray");
+
+    {
+        const Type& t = *registry.get("/StructArray");
+        
+        StructArray sa;
+        struct A a = { 10, -23, 51, 112 };
+        struct A b = { -12452134, 12, 33, -1 };
+        sa.A_vector.push_back(a);
+        sa.A_vector.push_back(b);
+        sa.A_vector.push_back(b);
+        sa.A_vector.push_back(a);
+
+        Value v(&sa, t);
+        
+        VectorToc toc = VectorTocMaker().apply(t);
+
+        ConvertToVector ctv(toc,registry);
+        ctv.setSlice("A_vector.*.a");
+        
+        std::vector<double> dbl_vec;
+        for (int i=0; i<sa.A_vector.size(); i++) {
+            dbl_vec.push_back(sa.A_vector[i].a);
+        }
+    
+        std::vector<double> res = ctv.apply(v,false);
+        
+
+        BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+        BOOST_CHECK( res == dbl_vec );
+    }
+    
+    BOOST_TEST_CHECKPOINT("sliced ContainerContainer");
+
+    {
+        const Type& t = *registry.get("/ContainerContainer");
+        
+        ContainerContainer cc;
+        DoubleVector dv;
+        dv.a = 10;
+        dv.dbl_vector.push_back(12.2);
+        cc.dbl_vv.push_back(dv);
+        dv.a = -23;
+        dv.dbl_vector.push_back(23.0);
+        dv.dbl_vector.push_back(-142.2);
+        cc.dbl_vv.push_back(dv);
+        dv.a = 0;
+        dv.dbl_vector.pop_back();
+        cc.dbl_vv.push_back(dv);
+
+        Value v(&cc, t);
+        
+        VectorToc toc = VectorTocMaker().apply(t);
+
+        ConvertToVector ctv(toc,registry);
+        ctv.setSlice("dbl_vv.*.a dbl_vv.[0,2].dbl_vector.1");
+        
+        std::vector<double> dbl_vec;
+        dbl_vec.push_back(cc.dbl_vv[0].a);
+        dbl_vec.push_back(cc.dbl_vv[1].a);
+        dbl_vec.push_back(cc.dbl_vv[2].a);
+        dbl_vec.push_back(cc.dbl_vv[2].dbl_vector[1]);
+
+        std::vector<double> res = ctv.apply(v, true);
+
+        BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+        BOOST_CHECK( res == dbl_vec ); 
+
+        Eigen::VectorXd x(dbl_vec.size());
+        for (int i =0; i<dbl_vec.size(); i++)
+            x[i] = dbl_vec[i];
+
+        BOOST_CHECK ( x == ctv.getEigenVector() );
+
+    }
+
 }

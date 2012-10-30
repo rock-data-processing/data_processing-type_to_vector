@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
         SliceStore s("a"); 
         
         std::vector<std::string> ref;
-        ref.push_back("a");
+        ref.push_back("a.");
 
         BOOST_CHECK( ref == s.getPlaces() ); 
     }
@@ -221,8 +221,8 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
         SliceStore s("a b"); 
         
         std::vector<std::string> ref;
-        ref.push_back("a");
-        ref.push_back("b");
+        ref.push_back("a.");
+        ref.push_back("b.");
 
         BOOST_CHECK( ref == s.getPlaces() ); 
     }
@@ -231,9 +231,9 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
         SliceStore s("a.[1,4-5]"); 
         
         std::vector<std::string> ref;
-        ref.push_back("a.1");
-        ref.push_back("a.4");
-        ref.push_back("a.5");
+        ref.push_back("a.1.");
+        ref.push_back("a.4.");
+        ref.push_back("a.5.");
 
         BOOST_CHECK( ref == s.getPlaces() ); 
     }
@@ -242,15 +242,28 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
         SliceStore s("a.[1,4-5].[1,8] b.[1,3] c"); 
         
         std::vector<std::string> ref;
-        ref.push_back("a.1.1");
-        ref.push_back("a.1.8");
-        ref.push_back("a.4.1");
-        ref.push_back("a.4.8");
-        ref.push_back("a.5.1");
-        ref.push_back("a.5.8");
-        ref.push_back("b.1");
-        ref.push_back("b.3");
-        ref.push_back("c");
+        ref.push_back("a.1.1.");
+        ref.push_back("a.1.8.");
+        ref.push_back("a.4.1.");
+        ref.push_back("a.4.8.");
+        ref.push_back("a.5.1.");
+        ref.push_back("a.5.8.");
+        ref.push_back("b.1.");
+        ref.push_back("b.3.");
+        ref.push_back("c.");
+
+        BOOST_CHECK( ref == s.getPlaces() ); 
+    }
+    
+    { 
+        SliceStore s("[1,12,13-17:2]"); 
+        
+        std::vector<std::string> ref;
+        ref.push_back("1.");
+        ref.push_back("12.");
+        ref.push_back("13.");
+        ref.push_back("15.");
+        ref.push_back("17.");
 
         BOOST_CHECK( ref == s.getPlaces() ); 
     }
@@ -320,6 +333,18 @@ BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
 
         BOOST_CHECK( res == ref );
     }
+    
+    {
+        StringVector res = SliceMatcher::createGeneralPlaces("a.12.b.3.");
+        
+        StringVector ref;
+        ref.push_back("a.12.b.3.");
+        ref.push_back("a.12.b.*.");
+        ref.push_back("a.*.b.3.");
+        ref.push_back("a.*.b.*.");
+
+        BOOST_CHECK( res == ref );
+    }
 
     BOOST_TEST_CHECKPOINT("fits a slice");
     
@@ -337,6 +362,31 @@ BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
         BOOST_CHECK ( s.fitsASlice("a") );
         BOOST_CHECK ( s.fitsASlice("a.1") );
         BOOST_CHECK ( !s.fitsASlice("b") );
+    }
+    
+    { 
+        SliceMatcher s("[1,12,13-17:2]"); 
+        
+        BOOST_CHECK ( !s.fitsASlice("0") );
+        BOOST_CHECK ( s.fitsASlice("1") );
+        BOOST_CHECK ( !s.fitsASlice("2") );
+        BOOST_CHECK ( !s.fitsASlice("3") );
+        BOOST_CHECK ( !s.fitsASlice("4") );
+        BOOST_CHECK ( !s.fitsASlice("5") );
+        BOOST_CHECK ( !s.fitsASlice("6") );
+        BOOST_CHECK ( !s.fitsASlice("7") );
+        BOOST_CHECK ( !s.fitsASlice("8") );
+        BOOST_CHECK ( !s.fitsASlice("9") );
+        BOOST_CHECK ( !s.fitsASlice("10") );
+        BOOST_CHECK ( !s.fitsASlice("11") );
+        BOOST_CHECK ( s.fitsASlice("12") );
+        BOOST_CHECK ( s.fitsASlice("13") );
+        BOOST_CHECK ( !s.fitsASlice("14") );
+        BOOST_CHECK ( s.fitsASlice("15") );
+        BOOST_CHECK ( !s.fitsASlice("16") );
+        BOOST_CHECK ( s.fitsASlice("17") );
+        BOOST_CHECK ( !s.fitsASlice("18") );
+        BOOST_CHECK ( !s.fitsASlice("19") );
     }
     
     { 
@@ -365,15 +415,15 @@ BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
         SliceMatcher s("a.[1,4-5].[1,8] b.[1,3] c"); 
         
         std::vector<std::string> ref;
-        ref.push_back("a.1.1");
-        ref.push_back("a.1.8");
-        ref.push_back("a.4.1");
-        ref.push_back("a.4.8");
-        ref.push_back("a.5.1");
-        ref.push_back("a.5.8");
-        ref.push_back("b.1");
-        ref.push_back("b.3");
-        ref.push_back("c");
+        ref.push_back("a.1.1.");
+        ref.push_back("a.1.8.");
+        ref.push_back("a.4.1.");
+        ref.push_back("a.4.8.");
+        ref.push_back("a.5.1.");
+        ref.push_back("a.5.8.");
+        ref.push_back("b.1.");
+        ref.push_back("b.3.");
+        ref.push_back("c.");
 
         BOOST_CHECK( ref == s.getSlices().getPlaces() );
 
@@ -392,7 +442,7 @@ BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
         SliceMatcher s("*"); 
         
         std::vector<std::string> ref;
-        ref.push_back("*");
+        ref.push_back("*.");
 
         BOOST_CHECK( ref == s.getSlices().getPlaces() );
 
@@ -406,11 +456,11 @@ BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
         SliceMatcher s("a.*.[1,8] b.[1,3] c"); 
         
         std::vector<std::string> ref;
-        ref.push_back("a.*.1");
-        ref.push_back("a.*.8");
-        ref.push_back("b.1");
-        ref.push_back("b.3");
-        ref.push_back("c");
+        ref.push_back("a.*.1.");
+        ref.push_back("a.*.8.");
+        ref.push_back("b.1.");
+        ref.push_back("b.3.");
+        ref.push_back("c.");
 
         BOOST_CHECK( ref == s.getSlices().getPlaces() );
 
@@ -430,9 +480,9 @@ BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
         SliceMatcher s("a.*.b.[1-7:3].*.c"); 
         
         std::vector<std::string> ref;
-        ref.push_back("a.*.b.1.*.c");
-        ref.push_back("a.*.b.4.*.c");
-        ref.push_back("a.*.b.7.*.c");
+        ref.push_back("a.*.b.1.*.c.");
+        ref.push_back("a.*.b.4.*.c.");
+        ref.push_back("a.*.b.7.*.c.");
 
         BOOST_CHECK( ref == s.getSlices().getPlaces() );
 

@@ -19,7 +19,7 @@ SliceStore::SliceStore (const std::string& slice) {
         utilmm::stringlist::const_iterator pit = concrete_places.begin();
 
         for (; pit != concrete_places.end(); pit++ )
-            mPlaces.push_back(*pit);
+            mPlaces.push_back((*pit)+"."); // stop with a . to not 1 matching 10
     }
 }
 
@@ -179,7 +179,9 @@ utilmm::stringlist SliceStore::replaceIndicesSlices(const std::string& str,
 
 bool SliceMatcher::fitsASlice (const std::string& place) {
 
-    StringVector places = createGeneralPlaces(place);
+    std::string place_dot = place + ".";
+
+    StringVector places = createGeneralPlaces(place_dot);
     StringVector slices = mSlices.getPlaces();
 
     if ( slices.empty() ) return true;

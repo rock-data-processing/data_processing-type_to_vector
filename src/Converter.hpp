@@ -26,6 +26,7 @@ class Typelib::Registry;
 
 namespace general_processing {
 
+class SliceMatcher;
 
 /** Converts a \c Typelib::Value to a vector according to a \c VectorToc. 
  *
@@ -49,9 +50,9 @@ class ConvertToVector : public VectorTocVisitor {
     std::vector<void*> mBaseStack;
     std::vector<int> mContainersSizeStack;
     utilmm::stringlist mPlaceStack;
-    
-    std::string mSlice;
 
+    SliceMatcher* mpMatcher;
+    
     void* getPosition (const VectorValueInfo& info); 
 
     void push_element (const VectorValueInfo& info);
@@ -67,16 +68,15 @@ public:
      * element count.
      */
     ConvertToVector ( const VectorToc& toc, const Typelib::Registry& registry);
-    
-    /** Applies the visitor to a value. */
-    std::vector<double> apply ( const Typelib::Value& value,
-                                const std::string& slice,
-                                bool create_place_vector = true);
 
+    ~ConvertToVector();
+   
+    /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
+     *
+     * To get an eigen vector use getEigenVector after calling apply.
+     * \param create_place_vector \see getPlaceVector */ 
     std::vector<double> apply ( const Typelib::Value& value, 
-                                bool create_place_vector);
-    
-    std::vector<double> apply ( const Typelib::Value& value ); 
+                                bool create_place_vector = false );
     
     Eigen::VectorXd getEigenVector ();
     
@@ -84,6 +84,9 @@ public:
      *
      * Each entry gives the place in the type for the vector element at this index.*/
     StringVector getPlaceVector () { return mPlaceVector; }
+
+    /** Sets a slice. "" is no slice. */
+    void setSlice (const std::string& slice);
 };
 
 } // namespace general_processing
