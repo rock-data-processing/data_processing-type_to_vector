@@ -25,7 +25,7 @@ rock_executable( general_processing_test
     DEPS_CMAKE Boost
     NOINSTALL)
 
+target_link_libraries(general_processing_test boost_system)
+
 add_custom_command( TARGET general_processing_test POST_BUILD
-    COMMAND "ruby" ARGS "create_tlb.rb" ">" "TestTypes.tlb")
-    
-# DEPS_PKGCONFIG typelib eigen3
+    COMMAND "ruby" ARGS "create_tlb.rb" ">" "TestTypes.tlb") 
