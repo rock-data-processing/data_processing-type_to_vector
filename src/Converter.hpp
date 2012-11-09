@@ -28,6 +28,57 @@ namespace general_processing {
 
 class SliceMatcher;
 
+/** Only Converts the first level of an type. Will not go into containers. */
+class FlatConverter : public VectorTocVisitor {
+    
+    bool mCreatePlaceVector;
+    StringVector mPlaceVector;
+
+    std::vector<double> mVector;
+    
+    const VectorToc&  mToc;
+    
+    const Typelib::Value* mpValue;
+    
+    SliceMatcher* mpMatcher;
+    
+    virtual void* getPosition (const VectorValueInfo& info); 
+   
+    virtual void push_element (const VectorValueInfo& info);
+    
+protected:
+    
+    virtual void visit (const VectorValueInfo& info);
+
+public:
+    
+    /** Construction of the converter.
+     *
+     * \param toc is the \c VectorToc that describes the data.
+     */
+    FlatConverter (const VectorToc& toc);
+
+    ~FlatConverter ();
+   
+    /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
+     *
+     * To get an eigen vector use getEigenVector after calling apply.
+     * \param create_place_vector \see getPlaceVector */ 
+    virtual std::vector<double> apply ( const Typelib::Value& value, 
+                                bool create_place_vector = false );
+    
+    Eigen::VectorXd getEigenVector ();
+    
+    /** Returns a vector of string that describes what the conversion results actually contains. 
+     *
+     * Each entry gives the place in the type for the vector element at this index.*/
+    StringVector getPlaceVector () { return mPlaceVector; }
+
+    /** Sets a slice. "" is no slice. */
+    void setSlice (const std::string& slice);
+};
+    
+
 /** Converts a \c Typelib::Value to a vector according to a \c VectorToc. 
  *
  * Use apply to run the visitor and then getDoubleVector or getEigenVector to
@@ -88,6 +139,7 @@ public:
     /** Sets a slice. "" is no slice. */
     void setSlice (const std::string& slice);
 };
+
 
 } // namespace general_processing
 

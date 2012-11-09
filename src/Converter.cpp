@@ -10,6 +10,33 @@
 
 using namespace general_processing;
 
+void* FlatConverter::getPosition (const VectorValueInfo& info) {
+
+    void* ptr = mpValue->getData() + info.position;
+
+    return ptr;
+}
+
+void FlatConverter::push_element (const VectorValueInfo& info) {
+
+    bool push_this = true;
+    
+    if ( mpMatcher && !mpMatcher->fitsASlice(info.placeDescription) ) 
+        push_this = false;
+
+    if (mCreatePlaceVector && push_this) 
+        mPlaceVector.push_back(info.placeDescription);
+
+    if (push_this) mVector.push_back( info.castFun(getPosition(info)) );
+
+}
+
+void FlatConverter::visit (const VectorValueInfo& info) {
+
+    if (!info.content.get()) push_element(info);
+}
+
+
 void* ConvertToVector::getPosition (const VectorValueInfo& info) {
 
     void* ptr = mBaseStack.back() + info.position;
@@ -19,6 +46,48 @@ void* ConvertToVector::getPosition (const VectorValueInfo& info) {
 
     return ptr;
 }
+
+FlatConverter::FlatConverter (const VectorToc& toc) : 
+    mToc(toc), mpMatcher(0) {}
+
+FlatConverter::~FlatConverter () {
+    delete mpMatcher;
+}
+
+Eigen::VectorXd FlatConverter::getEigenVector () {
+
+    Eigen::VectorXd result;
+
+    if (!mVector.empty()) 
+        result = Eigen::Map<Eigen::VectorXd>(&(mVector[0]), mVector.size());
+
+    return result;
+}
+
+void FlatConverter::setSlice (const std::string& slice) {
+
+    if ( mpMatcher ) {
+        delete mpMatcher;
+        mpMatcher = 0;
+    }
+
+    if (slice != "") mpMatcher = new SliceMatcher(slice);
+}
+
+std::vector<double> FlatConverter::apply (const Typelib::Value& value, bool create_place_vector ) {
+
+    mVector.clear();
+    mPlaceVector.clear();
+
+    mCreatePlaceVector = create_place_vector;
+
+    mpValue = &value;
+
+    VectorTocVisitor::visit(mToc);
+
+    return mVector;
+}
+
 
 void ConvertToVector::push_element (const VectorValueInfo& info) {
 
@@ -95,7 +164,7 @@ ConvertToVector::ConvertToVector (const VectorToc& toc, const Typelib::Registry&
     mToc(toc), mrRegistry(registry), mpMatcher(0) {}
 
 ConvertToVector::~ConvertToVector () {
-    delete mpMatcher;
+    if (mpMatcher) delete mpMatcher;
 }
 
 std::vector<double> ConvertToVector::apply (const Typelib::Value& value, bool create_place_vector ) {

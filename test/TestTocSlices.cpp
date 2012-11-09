@@ -122,6 +122,23 @@ BOOST_AUTO_TEST_CASE( test_vectortocslicer ) {
         utilmm::stringlist sl2(ptoc.begin(), ptoc.end());
         BOOST_CHECK ( utilmm::join(sl2) == "dbl_vv.*.dbl_vector.*");
     }
+
+    BOOST_TEST_CHECKPOINT("slice ForFlatSliceTest");
+    {
+        const Type& t = *registry.get("/ForFlatSliceTest");
+        
+        VectorToc toc = VectorTocMaker().apply(t);
+        
+        std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
+        utilmm::stringlist sl(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl) == "a vec.* str.* b" );
+        
+        VectorToc toc2 = VectorTocSlicer::slice(toc,"vec b");
+        
+        ptoc = PlainTocVisitor().apply(toc2);
+        utilmm::stringlist sl2(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl2) == "vec.* b");
+    }
    
 }
 
@@ -237,5 +254,29 @@ BOOST_AUTO_TEST_CASE( test_slice_convertion ) {
         utilmm::stringlist places_list(places_res.begin(), places_res.end());
 
         BOOST_CHECK( utilmm::join(places_list) == places ); 
+    }
+    
+    BOOST_TEST_CHECKPOINT("conversion with sliced ForFlatSliceTest");
+    {
+        const Type& t = *registry.get("/ForFlatSliceTest");
+        
+        VectorToc toc = VectorTocMaker().apply(t);
+        VectorToc toc2 = VectorTocSlicer::slice(toc,"b");
+
+        ForFlatSliceTest ffst;
+        ffst.a = 12.1;
+        for ( double d = 0.0; d < 12; d+= 1.37)
+            ffst.vec.push_back(d);
+        ffst.str = "this is a test";
+        ffst.b = 33.0;
+        
+        Value v(&ffst, t);
+
+        FlatConverter fc(toc2);
+        
+        std::vector<double> res = fc.apply(v);
+
+        BOOST_CHECK( res.size() == 1 );
+        BOOST_CHECK( res[0] = ffst.b);
     }
 }

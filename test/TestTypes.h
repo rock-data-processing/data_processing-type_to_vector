@@ -50,6 +50,13 @@ struct ContainerContainer {
     std::vector<DoubleVector> dbl_vv;
 };
 
+struct ForFlatSliceTest {
+    double a;
+    std::vector<double> vec;
+    std::string str;
+    int b;
+};
+
 
 #endif // GENERALPROCESSING_TESTTYPES_H
 
