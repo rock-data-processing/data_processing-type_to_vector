@@ -17,6 +17,7 @@ set(TESTFILES   TestSuite.cpp
                 TestTocMaker.cpp 
                 TestConversion.cpp 
                 TestSlice.cpp
+                TestTocSlices.cpp
 )
 
 rock_executable( general_processing_test

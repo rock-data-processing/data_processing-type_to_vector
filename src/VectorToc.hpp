@@ -19,6 +19,8 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <utilmm/stringtools.hh>
+
 #include "NumericConverter.hpp"
 
 namespace general_processing {
@@ -77,6 +79,37 @@ protected:
 public:
     VectorTocVisitor(int max_depth=-1) : mMaxDepth(max_depth), mDepth(0) {}
 };
+
+class SliceMatcher;
+
+/** Generates a VectorToc by slicing another VectorToc.
+ *
+ * This can be used to convert a vector and should be faster
+ * since it has not to go through the whole VectorToc of a type.*/
+class VectorTocSlicer : public VectorTocVisitor {
+
+    const VectorToc& mToc;
+    std::vector<VectorToc> mResultStack;
+    utilmm::stringlist mPlaceStack;
+
+    SliceMatcher* mpMatcher;
+
+    void push_element (const VectorValueInfo& info);
+
+protected:
+    void visit (const VectorValueInfo& info);
+
+public:
+
+    VectorTocSlicer (const VectorToc& toc);
+    ~VectorTocSlicer ();
+
+    VectorToc apply (const std::string& slice);
+
+    static VectorToc slice (const VectorToc& toc, const std::string& slice);
+};
+
+
 
 } // namespace general_processing
 #endif // GENERALPROCESSING_VECTORTOC_HPP
