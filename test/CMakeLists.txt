@@ -31,3 +31,11 @@ target_link_libraries(general_processing_test boost_system)
 
 add_custom_command( TARGET general_processing_test POST_BUILD
     COMMAND "ruby" ARGS "create_tlb.rb" ">" "TestTypes.tlb") 
+
+rock_executable( general_processing_timing
+    SOURCES TestSuite.cpp Timing.cpp  
+    DEPS general_processing
+    DEPS_CMAKE Boost
+    NOINSTALL)
+
+target_link_libraries(general_processing_timing boost_system)

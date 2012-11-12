@@ -24,7 +24,6 @@
 std::ostream& operator<< (std::ostream& os, const general_processing::VectorValueInfo& info);
 std::ostream& operator<< (std::ostream& os, const general_processing::VectorToc& toc);
 
-
 namespace general_processing {
 
 /** Converts a toc into a vector of strings. */
