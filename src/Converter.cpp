@@ -10,6 +10,17 @@
 
 using namespace general_processing;
 
+Eigen::VectorXd AbstractConverter::getEigenVector () {
+
+    Eigen::VectorXd result;
+
+    if (!mVector.empty()) 
+        result = Eigen::Map<Eigen::VectorXd>(&(mVector[0]), mVector.size());
+
+    return result;
+}
+
+
 void* FlatConverter::getPosition (const VectorValueInfo& info) {
 
     void* ptr = mpValue->getData() + info.position;
@@ -37,31 +48,11 @@ void FlatConverter::visit (const VectorValueInfo& info) {
 }
 
 
-void* ConvertToVector::getPosition (const VectorValueInfo& info) {
-
-    void* ptr = mBaseStack.back() + info.position;
-
-    if (!mContainersSizeStack.empty())
-        ptr += mContainersSizeStack.back();
-
-    return ptr;
-}
-
 FlatConverter::FlatConverter (const VectorToc& toc) : 
-    mToc(toc), mpMatcher(0) {}
+    AbstractConverter(toc), mpMatcher(0) {}
 
 FlatConverter::~FlatConverter () {
     delete mpMatcher;
-}
-
-Eigen::VectorXd FlatConverter::getEigenVector () {
-
-    Eigen::VectorXd result;
-
-    if (!mVector.empty()) 
-        result = Eigen::Map<Eigen::VectorXd>(&(mVector[0]), mVector.size());
-
-    return result;
 }
 
 void FlatConverter::setSlice (const std::string& slice) {
@@ -88,6 +79,16 @@ std::vector<double> FlatConverter::apply (const Typelib::Value& value, bool crea
     return mVector;
 }
 
+
+void* ConvertToVector::getPosition (const VectorValueInfo& info) {
+
+    void* ptr = mBaseStack.back() + info.position;
+
+    if (!mContainersSizeStack.empty())
+        ptr += mContainersSizeStack.back();
+
+    return ptr;
+}
 
 void ConvertToVector::push_element (const VectorValueInfo& info) {
 
@@ -161,11 +162,7 @@ void ConvertToVector::visit (const VectorValueInfo& info) {
 }
 
 ConvertToVector::ConvertToVector (const VectorToc& toc, const Typelib::Registry& registry) : 
-    mToc(toc), mrRegistry(registry), mpMatcher(0) {}
-
-ConvertToVector::~ConvertToVector () {
-    if (mpMatcher) delete mpMatcher;
-}
+    FlatConverter(toc), mrRegistry(registry) {}
 
 std::vector<double> ConvertToVector::apply (const Typelib::Value& value, bool create_place_vector ) {
 
@@ -185,23 +182,4 @@ std::vector<double> ConvertToVector::apply (const Typelib::Value& value, bool cr
 
     return mVector;
 
-}
-    
-Eigen::VectorXd ConvertToVector::getEigenVector () {
-    Eigen::VectorXd result;
-
-    if (!mVector.empty()) 
-        result = Eigen::Map<Eigen::VectorXd>(&(mVector[0]), mVector.size());
-
-    return result;
-}
-
-void ConvertToVector::setSlice (const std::string& slice) {
-
-    if ( mpMatcher ) {
-        delete mpMatcher;
-        mpMatcher = 0;
-    }
-
-    if (slice != "") mpMatcher = new SliceMatcher(slice);
-}
+} 

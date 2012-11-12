@@ -28,26 +28,54 @@ namespace general_processing {
 
 class SliceMatcher;
 
-/** Only Converts the first level of an type. Will not go into containers. */
-class FlatConverter : public VectorTocVisitor {
-    
-    bool mCreatePlaceVector;
-    StringVector mPlaceVector;
 
-    std::vector<double> mVector;
-    
+/** Basic functionality of converters. */
+class AbstractConverter {
+
+protected:    
     const VectorToc&  mToc;
     
+    std::vector<double> mVector;
+    
+    StringVector mPlaceVector;
+      
+public:
+    
+    AbstractConverter (const VectorToc& toc) : mToc(toc) {}
+    
+    /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
+     *
+     * To get an eigen vector use getEigenVector after calling apply.
+     * \param create_place_vector \see getPlaceVector */ 
+    virtual std::vector<double> apply ( const Typelib::Value& value, 
+                                bool create_place_vector = false ) = 0;
+    
+    /** Returns the result of the last conversion as an Eigen::VectorXd. */
+    Eigen::VectorXd getEigenVector ();
+    
+    /** Returns a vector of string that describes what the conversion results actually 
+     *  contains. 
+     *
+     * Each entry gives the place in the type for the vector element at this index.
+     * Should only be created when create_place_vector was set to true. */
+    StringVector getPlaceVector () { return mPlaceVector; }
+};
+
+
+/** Only Converts the first level of an type. Will not go into containers. */
+class FlatConverter : public AbstractConverter, public VectorTocVisitor {
+      
+protected:
     const Typelib::Value* mpValue;
     
+    bool mCreatePlaceVector;
+
     SliceMatcher* mpMatcher;
     
     virtual void* getPosition (const VectorValueInfo& info); 
    
     virtual void push_element (const VectorValueInfo& info);
-    
-protected:
-    
+     
     virtual void visit (const VectorValueInfo& info);
 
 public:
@@ -58,7 +86,7 @@ public:
      */
     FlatConverter (const VectorToc& toc);
 
-    ~FlatConverter ();
+    virtual ~FlatConverter ();
    
     /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
      *
@@ -67,13 +95,6 @@ public:
     virtual std::vector<double> apply ( const Typelib::Value& value, 
                                 bool create_place_vector = false );
     
-    Eigen::VectorXd getEigenVector ();
-    
-    /** Returns a vector of string that describes what the conversion results actually contains. 
-     *
-     * Each entry gives the place in the type for the vector element at this index.*/
-    StringVector getPlaceVector () { return mPlaceVector; }
-
     /** Sets a slice. "" is no slice. */
     void setSlice (const std::string& slice);
 };
@@ -87,28 +108,19 @@ public:
  * The function getFlatToc gives the concrete toc for the last handled value. 
  *
  * \warning std containers are handled, but for other containers it might not work. */
-class ConvertToVector : public VectorTocVisitor {
+class ConvertToVector : public FlatConverter {
 
     const Typelib::Registry& mrRegistry;
 
-    bool mCreatePlaceVector;
-    StringVector mPlaceVector;
-    std::vector<double> mVector;
-
-    const VectorToc&  mToc;
-
-    const Typelib::Value* mpValue;
     std::vector<void*> mBaseStack;
     std::vector<int> mContainersSizeStack;
     utilmm::stringlist mPlaceStack;
 
-    SliceMatcher* mpMatcher;
-    
+protected:
     void* getPosition (const VectorValueInfo& info); 
 
     void push_element (const VectorValueInfo& info);
 
-protected:
     void visit (const VectorValueInfo& info);
 
 public:
@@ -120,24 +132,12 @@ public:
      */
     ConvertToVector ( const VectorToc& toc, const Typelib::Registry& registry);
 
-    ~ConvertToVector();
-   
     /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
      *
      * To get an eigen vector use getEigenVector after calling apply.
      * \param create_place_vector \see getPlaceVector */ 
     std::vector<double> apply ( const Typelib::Value& value, 
                                 bool create_place_vector = false );
-    
-    Eigen::VectorXd getEigenVector ();
-    
-    /** Returns a vector of string that describes what the conversion results actually contains. 
-     *
-     * Each entry gives the place in the type for the vector element at this index.*/
-    StringVector getPlaceVector () { return mPlaceVector; }
-
-    /** Sets a slice. "" is no slice. */
-    void setSlice (const std::string& slice);
 };
 
 
