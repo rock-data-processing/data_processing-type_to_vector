@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_multi_struct )
 
     Value v(&b, t);
 
-    VectorToc toc = VectorTocMaker().apply(t);
+    VectorToc toc = VectorTocMaker().apply(t); 
     
     FlatConverter fc(toc);
     
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_container )
 
     std::vector<double> res = fc.apply(v);
 
-    BOOST_REQUIRE( res.empty() );
+    BOOST_CHECK( res.empty() );
 
 }
 
@@ -225,8 +225,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_string )
     
     std::vector<double> res = fc.apply(v);
 
-    BOOST_CHECK( res.empty() );
-    
+    BOOST_CHECK( res.empty() ); 
 }
 
 BOOST_AUTO_TEST_CASE( test_flat_convert_advanced )
@@ -562,3 +561,62 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_with_slice ) {
     }
 
 }
+
+BOOST_AUTO_TEST_CASE( test_single_convert_multi_struct )
+{
+    Registry registry;
+    import_types(registry);
+
+    struct B b = { '0', { 100, -23, 'c', 12 } };
+    
+    const Type& t = *registry.get("/B");
+
+    Value v(&b, t);
+
+    VectorToc toc = VectorTocMaker().apply(t);
+    
+    SingleConverter sc(toc);
+    
+    std::vector<double> dbl_vec;
+    dbl_vec.push_back(double(b.a));
+
+    std::vector<double> res = sc.apply(v, true);
+
+    BOOST_REQUIRE ( res.size() == dbl_vec.size() );
+
+    BOOST_CHECK( dbl_vec == res );
+    
+    BOOST_TEST_CHECKPOINT("Testing struct B places");
+
+    std::string places = "a";
+
+    std::vector<std::string> places_res = sc.getPlaceVector();
+    utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+    BOOST_CHECK( utilmm::join(places_list) == places );
+}
+
+BOOST_AUTO_TEST_CASE( test_single_convert_container )
+{
+    Registry registry;
+    import_types(registry);
+
+    const Type& t = *registry.get("/std/vector</int>");
+    
+    VectorToc toc = VectorTocMaker().apply(t);
+
+    SingleConverter sc(toc);
+    
+    std::vector<int> int_vec;
+    int_vec.push_back(-10);
+    int_vec.push_back(22);
+    int_vec.push_back(3);
+
+    Value v(&int_vec, t); 
+
+    std::vector<double> res = sc.apply(v);
+
+    BOOST_CHECK( res.empty() );
+}
+
+

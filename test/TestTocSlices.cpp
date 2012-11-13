@@ -303,3 +303,38 @@ BOOST_AUTO_TEST_CASE( test_slice_convertion ) {
         BOOST_CHECK( res[0] = ffst.b);
     }
 }
+
+BOOST_AUTO_TEST_CASE( test_single_convert_multi_struct_slicing )
+{
+    Registry registry;
+    import_types(registry);
+
+    struct B b = { '0', { 100, -23, 'c', 12 } };
+    
+    const Type& t = *registry.get("/B");
+
+    Value v(&b, t);
+
+    VectorToc toc = VectorTocMaker().apply(t);
+    VectorToc toc2 = VectorTocSlicer::slice(toc,"b.b b.c");
+    
+    SingleConverter sc(toc2);
+    
+    std::vector<double> dbl_vec;
+    dbl_vec.push_back(double(b.b.b));
+
+    std::vector<double> res = sc.apply(v, true);
+
+    BOOST_REQUIRE ( res.size() == dbl_vec.size() );
+
+    BOOST_CHECK( dbl_vec == res );
+    
+    BOOST_TEST_CHECKPOINT("Testing struct B places");
+
+    std::string places = "b.b";
+
+    std::vector<std::string> places_res = sc.getPlaceVector();
+    utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+    BOOST_CHECK( utilmm::join(places_list) == places );
+}

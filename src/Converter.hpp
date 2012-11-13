@@ -35,7 +35,7 @@ class AbstractConverter {
 protected:    
     const VectorToc mToc;
     
-    std::vector<double> mVector;
+    VectorOfDoubles mVector;
     
     StringVector mPlaceVector;
       
@@ -47,8 +47,8 @@ public:
      *
      * To get an eigen vector use getEigenVector after calling apply.
      * \param create_place_vector \see getPlaceVector */ 
-    virtual std::vector<double> apply ( const Typelib::Value& value, 
-                                bool create_place_vector = false ) = 0;
+    virtual VectorOfDoubles apply ( const Typelib::Value& value, 
+                                    bool create_place_vector = false ) = 0;
     
     /** Returns the result of the last conversion as an Eigen::VectorXd. */
     Eigen::VectorXd getEigenVector ();
@@ -59,6 +59,32 @@ public:
      * Each entry gives the place in the type for the vector element at this index.
      * Should only be created when create_place_vector was set to true. */
     StringVector getPlaceVector () { return mPlaceVector; }
+};
+
+/** Only converts a single value (the first one in the toc). */
+class SingleConverter : public AbstractConverter {
+public:
+    SingleConverter ( const VectorToc& toc) : AbstractConverter(toc) {}
+
+    VectorOfDoubles apply( const Typelib::Value& value, 
+                           bool create_place_vector = false );
+
+};
+
+/** Can be used to apply a factor to all converted values. */
+class MultiplyConverter: public AbstractConverter {
+
+    boost::shared_ptr<AbstractConverter> mpConverter;
+    double mFactor;
+
+public:
+    MultiplyConverter (boost::shared_ptr<AbstractConverter> converter, double factor);
+    
+    virtual VectorOfDoubles apply ( const Typelib::Value& value, 
+                                    bool create_place_vector = false );
+
+    double getFactor() { return mFactor; }
+    void setFactor (double factor) { mFactor = factor; }
 };
 
 /** Only converts the first level of an type. Will not go into containers. */
@@ -91,8 +117,8 @@ public:
      *
      * To get an eigen vector use getEigenVector after calling apply.
      * \param create_place_vector \see getPlaceVector */ 
-    virtual std::vector<double> apply ( const Typelib::Value& value, 
-                                bool create_place_vector = false );
+    virtual VectorOfDoubles apply ( const Typelib::Value& value, 
+                                    bool create_place_vector = false );
     
     /** Sets a slice. "" is no slice. */
     void setSlice (const std::string& slice);
@@ -135,8 +161,8 @@ public:
      *
      * To get an eigen vector use getEigenVector after calling apply.
      * \param create_place_vector \see getPlaceVector */ 
-    std::vector<double> apply ( const Typelib::Value& value, 
-                                bool create_place_vector = false );
+    VectorOfDoubles apply ( const Typelib::Value& value, 
+                            bool create_place_vector = false );
 };
 
 } // namespace general_processing

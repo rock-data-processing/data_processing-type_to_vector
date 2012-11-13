@@ -21,6 +21,8 @@ namespace general_processing {
 
 typedef std::vector<std::string> StringVector;
 
+typedef std::vector<double> VectorOfDoubles;
+
 } // namesspace general_processing
 
 #endif // GENERALPROCESSING_DEFINITIONS_HPP

@@ -632,3 +632,73 @@ BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {
     }
 
 }
+    
+BOOST_AUTO_TEST_CASE( test_multiply_converter )
+{
+    Registry registry;
+    import_types(registry);
+    const Type& t = *registry.get("/ContainerContainer");
+    
+    ContainerContainer cc;
+    DoubleVector dv;
+    dv.a = 10;
+    dv.dbl_vector.push_back(12.2);
+    cc.dbl_vv.push_back(dv);
+    dv.a = -23;
+    dv.dbl_vector.push_back(23.0);
+    dv.dbl_vector.push_back(-142.2);
+    cc.dbl_vv.push_back(dv);
+    dv.a = 0;
+    dv.dbl_vector.pop_back();
+    cc.dbl_vv.push_back(dv);
+
+    Value v(&cc, t);
+    
+    VectorToc toc = VectorTocMaker().apply(t);
+
+    boost::shared_ptr<AbstractConverter> ctv(new ConvertToVector(toc,registry));
+    MultiplyConverter mc(ctv, 10.0);
+    
+    std::vector<double> dbl_vec;
+    for (int i=0; i<cc.dbl_vv.size(); i++) {
+        dbl_vec.push_back(cc.dbl_vv[i].a * 10.0);
+        for (int j=0; j<cc.dbl_vv[i].dbl_vector.size(); j++ )
+            dbl_vec.push_back(cc.dbl_vv[i].dbl_vector[j] * 10.0);
+    }
+
+    std::vector<double> res = mc.apply(v, true);
+
+    BOOST_REQUIRE( res.size() == dbl_vec.size() );
+
+    BOOST_CHECK( res == dbl_vec );
+
+    BOOST_TEST_CHECKPOINT("Testing ContainerContainer places");
+
+    std::string places = 
+        "dbl_vv.0.a "
+        "dbl_vv.0.dbl_vector.0 "
+        "dbl_vv.1.a "
+        "dbl_vv.1.dbl_vector.0 "
+        "dbl_vv.1.dbl_vector.1 "
+        "dbl_vv.1.dbl_vector.2 "
+        "dbl_vv.2.a "
+        "dbl_vv.2.dbl_vector.0 "
+        "dbl_vv.2.dbl_vector.1";
+
+    std::vector<std::string> places_res = mc.getPlaceVector();
+    utilmm::stringlist places_list(places_res.begin(), places_res.end());
+
+    BOOST_CHECK( utilmm::join(places_list) == places );
+    
+    mc.apply(v, false);
+
+    BOOST_CHECK( mc.getPlaceVector().empty() );
+
+    BOOST_TEST_CHECKPOINT("Testing Eigen::VectorXd output");
+
+    Eigen::VectorXd x(dbl_vec.size());
+    for (int i =0; i<dbl_vec.size(); i++)
+        x[i] = dbl_vec[i];
+
+    BOOST_CHECK ( x == mc.getEigenVector() );
+}

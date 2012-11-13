@@ -21,6 +21,42 @@ Eigen::VectorXd AbstractConverter::getEigenVector () {
 }
 
 
+VectorOfDoubles SingleConverter::apply (const Typelib::Value& value, 
+        bool create_place_vector) {
+
+    mVector.clear();
+    if (!mToc.front().content.get()) {
+        void* ptr = value.getData() + mToc.front().position;
+
+        mVector.push_back(mToc.front().castFun(ptr));
+    
+        if ( create_place_vector && mPlaceVector.empty() )
+            mPlaceVector.push_back(mToc.front().placeDescription);
+    }
+
+    return mVector;
+}
+
+MultiplyConverter::MultiplyConverter (boost::shared_ptr<AbstractConverter> converter,
+        double factor) : AbstractConverter(VectorToc()), mpConverter(converter),
+    mFactor(factor) {}
+
+VectorOfDoubles MultiplyConverter::apply (const Typelib::Value& value, 
+                           bool create_place_vector) {
+
+    mVector = mpConverter->apply(value, create_place_vector);
+    
+    VectorOfDoubles::iterator it = mVector.begin();
+
+    for ( ; it != mVector.end(); it++)
+        *it *= mFactor;
+
+    if ( create_place_vector ) mPlaceVector = mpConverter->getPlaceVector();
+    else mPlaceVector.clear();
+
+    return mVector;
+}
+
 void* FlatConverter::getPosition (const VectorValueInfo& info) {
 
     void* ptr = mpValue->getData() + info.position;
@@ -164,7 +200,8 @@ void ConvertToVector::visit (const VectorValueInfo& info) {
 ConvertToVector::ConvertToVector (const VectorToc& toc, const Typelib::Registry& registry) : 
     FlatConverter(toc), mrRegistry(registry) {}
 
-std::vector<double> ConvertToVector::apply (const Typelib::Value& value, bool create_place_vector ) {
+std::vector<double> ConvertToVector::apply (const Typelib::Value& value, 
+        bool create_place_vector) {
 
     mVector.clear();
     mPlaceVector.clear();
