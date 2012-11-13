@@ -33,7 +33,7 @@ class SliceMatcher;
 class AbstractConverter {
 
 protected:    
-    const VectorToc&  mToc;
+    const VectorToc mToc;
     
     std::vector<double> mVector;
     
@@ -61,8 +61,7 @@ public:
     StringVector getPlaceVector () { return mPlaceVector; }
 };
 
-
-/** Only Converts the first level of an type. Will not go into containers. */
+/** Only converts the first level of an type. Will not go into containers. */
 class FlatConverter : public AbstractConverter, public VectorTocVisitor {
       
 protected:
@@ -139,7 +138,6 @@ public:
     std::vector<double> apply ( const Typelib::Value& value, 
                                 bool create_place_vector = false );
 };
-
 
 } // namespace general_processing
 
