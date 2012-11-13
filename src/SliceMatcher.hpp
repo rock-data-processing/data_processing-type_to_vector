@@ -27,7 +27,9 @@ typedef std::set<unsigned int> IntSet;
 /** Takes a slice and store it in a way that a match can be find easily. 
  *
  * Slice define what part of a vector shall be put into the vector.
- * Slices describe the place in the type. Levels are separated by space.
+ * Slices describe the place in the type. Levels are separated by dot.
+ * An inverse slice starting with '!' means that all described places should not be
+ * in a vector.
  * Countable types like arrays or containers can be sliced with the valid indicies 
  * in brackets:
  * all indices: *
@@ -53,11 +55,14 @@ typedef std::set<unsigned int> IntSet;
  * get b of first and third B.data: "data.[0,2].b"
  * get idx and b of B.data: "idx data.b"
  * get field c of all B.data: "data.*.c"
+ * get not field B.idx and not all B.data.b: "! idx data.b"
+ * get nothing: "!"
  * */
 class SliceStore {
 
     StringVector mPlaces; //!< Valid places;
     IntSet mStarTokens; //!< Tokens indices at which stars are found.
+    bool mInverseSlices; //!< The members of the slice should not be in here.
 
 public:
     
@@ -79,8 +84,10 @@ public:
 
     /** A set of indices at which a star is in the slice description. */
     const IntSet& getStarTokens () const { return mStarTokens; }
- 
 
+    /** Returns ture if the stored slices should not be in a vector.*/
+    bool isInverse() { return mInverseSlices; }
+ 
     /** Put an index slice string into an IndexSlice struct. */
     static IndexSlice getIndices (const std::string& slice);
 

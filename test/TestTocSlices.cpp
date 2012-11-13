@@ -80,6 +80,29 @@ BOOST_AUTO_TEST_CASE( test_vectortocslicer ) {
         utilmm::stringlist sl3(ptoc.begin(), ptoc.end());
         BOOST_CHECK ( utilmm::join(sl3) == "b.b b.c" ); 
     }
+    
+    BOOST_TEST_CHECKPOINT("inverse slice B");
+    {
+        const Type& t = *registry.get("/B");
+
+        VectorToc toc = VectorTocMaker().apply(t);
+
+        std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
+        utilmm::stringlist sl(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl) == "a b.a b.b b.c b.d" );
+        
+        VectorToc toc2 = VectorTocSlicer::slice(toc,"!b.b b.c");
+        
+        ptoc = PlainTocVisitor().apply(toc2);
+        utilmm::stringlist sl2(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl2) == "a b.a b.d" );
+        
+        VectorToc toc3 = VectorTocSlicer::slice(toc,"! a b.d");
+        
+        ptoc = PlainTocVisitor().apply(toc3);
+        utilmm::stringlist sl3(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl3) == "b.a b.b b.c" ); 
+    }
 
     BOOST_TEST_CHECKPOINT("slice StructArray");
     {

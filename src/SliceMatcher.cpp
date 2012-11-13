@@ -7,8 +7,15 @@
 using namespace general_processing;
 
 SliceStore::SliceStore (const std::string& slice) {
-    
-    utilmm::stringlist places = utilmm::split(slice," ");
+  
+    mInverseSlices = slice[0] == '!';
+
+    utilmm::stringlist places;
+
+    if ( mInverseSlices )
+        places = utilmm::split(slice.substr(1), " ");
+    else
+        places = utilmm::split(slice," ");
 
     utilmm::stringlist::const_iterator it = places.begin();
     
@@ -176,7 +183,6 @@ utilmm::stringlist SliceStore::replaceIndicesSlices(const std::string& str,
 }
 
 
-
 bool SliceMatcher::fitsASlice (const std::string& place) {
 
     std::string place_dot = place + ".";
@@ -184,7 +190,7 @@ bool SliceMatcher::fitsASlice (const std::string& place) {
     StringVector places = createGeneralPlaces(place_dot);
     StringVector slices = mSlices.getPlaces();
 
-    if ( slices.empty() ) return true;
+    if ( slices.empty() ) return !mSlices.isInverse();
 
     StringVector::const_iterator it_places = places.begin();
 
@@ -194,10 +200,10 @@ bool SliceMatcher::fitsASlice (const std::string& place) {
 
         for ( ; it_slices != slices.end(); it_slices++ )
 
-            if ( startswith(*it_places, *it_slices) ) return true;
+            if ( startswith(*it_places, *it_slices) ) return !mSlices.isInverse();
     }
 
-    return false;
+    return mSlices.isInverse();
 }
 
 StringVector SliceMatcher::createGeneralPlaces (const std::string& place, size_t start) {
