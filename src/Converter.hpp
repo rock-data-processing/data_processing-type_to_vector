@@ -40,8 +40,11 @@ protected:
     StringVector mPlaceVector;
       
 public:
+    typedef boost::shared_ptr<AbstractConverter> Pointer;
     
     AbstractConverter (const VectorToc& toc) : mToc(toc) {}
+
+    std::string getTypeName() { return mToc.mType; }
     
     /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
      *
@@ -70,7 +73,7 @@ public:
 /** Only converts a single value (the first one in the toc). */
 class SingleConverter : public AbstractConverter {
 public:
-    SingleConverter ( const VectorToc& toc) : AbstractConverter(toc) {}
+    SingleConverter (const VectorToc& toc) : AbstractConverter(toc) {}
 
     VectorOfDoubles apply (void* data, bool create_place_vector = false);
 
@@ -79,11 +82,11 @@ public:
 /** Can be used to apply a factor to all converted values. */
 class MultiplyConverter: public AbstractConverter {
 
-    boost::shared_ptr<AbstractConverter> mpConverter;
+    AbstractConverter::Pointer mpConverter;
     double mFactor;
 
 public:
-    MultiplyConverter (boost::shared_ptr<AbstractConverter> converter, double factor);
+    MultiplyConverter (AbstractConverter::Pointer converter, double factor);
     
     virtual VectorOfDoubles apply (void* data, bool create_place_vector = false);
 
@@ -154,7 +157,7 @@ public:
      * \param registry it is needed when containers are in the type to resolve the
      * element count.
      */
-    ConvertToVector ( const VectorToc& toc, const Typelib::Registry& registry);
+    ConvertToVector (const VectorToc& toc, const Typelib::Registry& registry);
 
     VectorOfDoubles apply (void* data, bool create_place_vector = false);
 };

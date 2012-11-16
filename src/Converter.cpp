@@ -45,9 +45,9 @@ VectorOfDoubles SingleConverter::apply (void* data, bool create_place_vector) {
     return mVector;
 }
 
-MultiplyConverter::MultiplyConverter (boost::shared_ptr<AbstractConverter> converter,
-        double factor) : AbstractConverter(VectorToc()), mpConverter(converter),
-    mFactor(factor) {}
+MultiplyConverter::MultiplyConverter (AbstractConverter::Pointer converter, 
+        double factor) : AbstractConverter(VectorToc()), mpConverter(converter), 
+            mFactor(factor) {}
 
 VectorOfDoubles MultiplyConverter::apply (void* data, bool create_place_vector) {
 
