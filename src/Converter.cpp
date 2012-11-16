@@ -10,6 +10,15 @@
 
 using namespace general_processing;
 
+VectorOfDoubles AbstractConverter::applyToValue (const Typelib::Value& value,
+        bool create_place_vector) {
+
+    if ( value.getType().getName() != mToc.mType ) 
+        std::runtime_error("value type does not match converter type");
+
+    return apply(value.getData(), create_place_vector);
+}
+
 Eigen::VectorXd AbstractConverter::getEigenVector () {
 
     Eigen::VectorXd result;
@@ -21,12 +30,11 @@ Eigen::VectorXd AbstractConverter::getEigenVector () {
 }
 
 
-VectorOfDoubles SingleConverter::apply (const Typelib::Value& value, 
-        bool create_place_vector) {
+VectorOfDoubles SingleConverter::apply (void* data, bool create_place_vector) {
 
     mVector.clear();
     if (!mToc.front().content.get()) {
-        void* ptr = value.getData() + mToc.front().position;
+        void* ptr = data + mToc.front().position;
 
         mVector.push_back(mToc.front().castFun(ptr));
     
@@ -41,10 +49,9 @@ MultiplyConverter::MultiplyConverter (boost::shared_ptr<AbstractConverter> conve
         double factor) : AbstractConverter(VectorToc()), mpConverter(converter),
     mFactor(factor) {}
 
-VectorOfDoubles MultiplyConverter::apply (const Typelib::Value& value, 
-                           bool create_place_vector) {
+VectorOfDoubles MultiplyConverter::apply (void* data, bool create_place_vector) {
 
-    mVector = mpConverter->apply(value, create_place_vector);
+    mVector = mpConverter->apply(data, create_place_vector);
     
     VectorOfDoubles::iterator it = mVector.begin();
 
@@ -57,9 +64,10 @@ VectorOfDoubles MultiplyConverter::apply (const Typelib::Value& value,
     return mVector;
 }
 
+
 void* FlatConverter::getPosition (const VectorValueInfo& info) {
 
-    void* ptr = mpValue->getData() + info.position;
+    void* ptr = mpData + info.position;
 
     return ptr;
 }
@@ -101,14 +109,14 @@ void FlatConverter::setSlice (const std::string& slice) {
     if (slice != "") mpMatcher = new SliceMatcher(slice);
 }
 
-std::vector<double> FlatConverter::apply (const Typelib::Value& value, bool create_place_vector ) {
+std::vector<double> FlatConverter::apply (void* data, bool create_place_vector ) {
 
     mVector.clear();
     mPlaceVector.clear();
 
     mCreatePlaceVector = create_place_vector;
 
-    mpValue = &value;
+    mpData = data;
 
     VectorTocVisitor::visit(mToc);
 
@@ -200,18 +208,15 @@ void ConvertToVector::visit (const VectorValueInfo& info) {
 ConvertToVector::ConvertToVector (const VectorToc& toc, const Typelib::Registry& registry) : 
     FlatConverter(toc), mrRegistry(registry) {}
 
-std::vector<double> ConvertToVector::apply (const Typelib::Value& value, 
-        bool create_place_vector) {
+std::vector<double> ConvertToVector::apply (void* data, bool create_place_vector) {
 
     mVector.clear();
     mPlaceVector.clear();
 
     mCreatePlaceVector = create_place_vector;
 
-    mpValue = &value;
-
     mBaseStack.clear();
-    mBaseStack.push_back(mpValue->getData());
+    mBaseStack.push_back(data);
     mContainersSizeStack.clear();
     mPlaceStack.clear();
 

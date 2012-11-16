@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_scalar )
         std::vector<double> dbl_vec;
         dbl_vec.push_back(f);
 
-        BOOST_CHECK( dbl_vec == fc.apply(v,true) );
+        BOOST_CHECK( dbl_vec == fc.applyToValue(v,true) );
         
         BOOST_TEST_CHECKPOINT("Testing double places");
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_scalar )
         std::vector<double> dbl_vec;
         dbl_vec.push_back(i);
 
-        BOOST_CHECK( dbl_vec == fc.apply(v) );
+        BOOST_CHECK( dbl_vec == fc.applyToValue(v) );
     }
     
     {
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_scalar )
         std::vector<double> dbl_vec;
         dbl_vec.push_back(c);
 
-        BOOST_CHECK( dbl_vec == fc.apply(v) );
+        BOOST_CHECK( dbl_vec == fc.applyToValue(v) );
     }
 
 }
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_array )
     std::vector<double> dbl_vec;
     for (int i=0; i<3; i++) dbl_vec.push_back(d[i]);
 
-    BOOST_CHECK( dbl_vec == fc.apply(v, true) );
+    BOOST_CHECK( dbl_vec == fc.applyToValue(v, true) );
         
     BOOST_TEST_CHECKPOINT("Testing double[3] places");
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_struct )
     dbl_vec.push_back(double(a.c));
     dbl_vec.push_back(double(a.d));
 
-    std::vector<double> res = fc.apply(v, true);
+    std::vector<double> res = fc.applyToValue(v, true);
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_multi_struct )
     dbl_vec.push_back(double(b.b.c));
     dbl_vec.push_back(double(b.b.d));
 
-    std::vector<double> res = fc.apply(v, true);
+    std::vector<double> res = fc.applyToValue(v, true);
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_container )
 
     Value v(&int_vec, t); 
 
-    std::vector<double> res = fc.apply(v);
+    std::vector<double> res = fc.applyToValue(v);
 
     BOOST_CHECK( res.empty() );
 
@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_string )
 
     FlatConverter fc(toc);
     
-    std::vector<double> res = fc.apply(v);
+    std::vector<double> res = fc.applyToValue(v);
 
     BOOST_CHECK( res.empty() ); 
 }
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_advanced )
 
         FlatConverter fc(toc);
         
-        std::vector<double> res = fc.apply(v);
+        std::vector<double> res = fc.applyToValue(v);
 
         BOOST_CHECK( res.size() == 1 );
         BOOST_CHECK( res[0] == dv.a );
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_advanced )
 
         FlatConverter fc(toc);
         
-        std::vector<double> res = fc.apply(v);
+        std::vector<double> res = fc.applyToValue(v);
 
         BOOST_CHECK( res.empty() ); 
     }
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_advanced )
         
         FlatConverter fc(toc);
         
-        std::vector<double> res = fc.apply(v);
+        std::vector<double> res = fc.applyToValue(v);
 
         BOOST_CHECK( res.empty() ); 
     }
@@ -320,7 +320,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_advanced )
         
         FlatConverter fc(toc);
         
-        std::vector<double> res = fc.apply(v);
+        std::vector<double> res = fc.applyToValue(v);
 
         BOOST_CHECK( res.empty() ); 
     }
@@ -342,7 +342,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_advanced )
 
         FlatConverter fc(toc);
         
-        std::vector<double> res = fc.apply(v, true);
+        std::vector<double> res = fc.applyToValue(v, true);
 
         BOOST_CHECK( res.size() == 2 );
         BOOST_CHECK( res[0] = ffst.a);
@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_with_slice ) {
 
         fc.setSlice("1");
 
-        BOOST_CHECK( dbl_vec == fc.apply(v, true) );
+        BOOST_CHECK( dbl_vec == fc.applyToValue(v, true) );
             
         std::string places = "1";
 
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_with_slice ) {
         dbl_vec.push_back(d[15]);
         dbl_vec.push_back(d[17]);
 
-        BOOST_CHECK( dbl_vec == fc.apply(v, true) );
+        BOOST_CHECK( dbl_vec == fc.applyToValue(v, true) );
             
         std::string places = "1 12 13 15 17";
 
@@ -445,7 +445,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_with_slice ) {
         dbl_vec.push_back(double(b.b.a));
         dbl_vec.push_back(double(b.b.c));
 
-        std::vector<double> res = fc.apply(v, true);
+        std::vector<double> res = fc.applyToValue(v, true);
 
         BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -475,7 +475,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_with_slice ) {
         FlatConverter fc(toc);
         fc.setSlice("[0,6-10]");
         
-        std::vector<double> res = fc.apply(v);
+        std::vector<double> res = fc.applyToValue(v);
 
         BOOST_CHECK( res.empty() ); 
     }
@@ -500,7 +500,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_with_slice ) {
         FlatConverter fc(toc);
         fc.setSlice("A_vector.*.a");
         
-        std::vector<double> res = fc.apply(v,false);
+        std::vector<double> res = fc.applyToValue(v,false);
         
         BOOST_CHECK( res.empty() ); 
     }
@@ -530,7 +530,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_with_slice ) {
         FlatConverter fc(toc);
         fc.setSlice("dbl_vv.*.a dbl_vv.[0,2].dbl_vector.1");
         
-        std::vector<double> res = fc.apply(v, true);
+        std::vector<double> res = fc.applyToValue(v, true);
 
         BOOST_CHECK( res.empty() ); 
     }
@@ -553,7 +553,7 @@ BOOST_AUTO_TEST_CASE( test_flat_convert_with_slice ) {
         FlatConverter fc(toc);
         fc.setSlice("str b");
         
-        std::vector<double> res = fc.apply(v, true);
+        std::vector<double> res = fc.applyToValue(v, true);
 
         BOOST_CHECK( res.size() == 1 );
         BOOST_CHECK( res[0] = ffst.b);
@@ -580,7 +580,7 @@ BOOST_AUTO_TEST_CASE( test_single_convert_multi_struct )
     std::vector<double> dbl_vec;
     dbl_vec.push_back(double(b.a));
 
-    std::vector<double> res = sc.apply(v, true);
+    std::vector<double> res = sc.applyToValue(v, true);
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -614,7 +614,7 @@ BOOST_AUTO_TEST_CASE( test_single_convert_container )
 
     Value v(&int_vec, t); 
 
-    std::vector<double> res = sc.apply(v);
+    std::vector<double> res = sc.applyToValue(v);
 
     BOOST_CHECK( res.empty() );
 }

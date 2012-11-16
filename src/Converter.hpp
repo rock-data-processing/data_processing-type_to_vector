@@ -47,8 +47,14 @@ public:
      *
      * To get an eigen vector use getEigenVector after calling apply.
      * \param create_place_vector \see getPlaceVector */ 
-    virtual VectorOfDoubles apply ( const Typelib::Value& value, 
-                                    bool create_place_vector = false ) = 0;
+    VectorOfDoubles applyToValue (const Typelib::Value& value, 
+            bool create_place_vector=false);
+    
+    /** Applies the converter to a some data and returns a vector of doubles.
+     *
+     * To get an eigen vector use getEigenVector after calling apply.
+     * \param create_place_vector \see getPlaceVector */ 
+    virtual VectorOfDoubles apply (void* data, bool create_place_vector = false) = 0;
     
     /** Returns the result of the last conversion as an Eigen::VectorXd. */
     Eigen::VectorXd getEigenVector ();
@@ -66,8 +72,7 @@ class SingleConverter : public AbstractConverter {
 public:
     SingleConverter ( const VectorToc& toc) : AbstractConverter(toc) {}
 
-    VectorOfDoubles apply( const Typelib::Value& value, 
-                           bool create_place_vector = false );
+    VectorOfDoubles apply (void* data, bool create_place_vector = false);
 
 };
 
@@ -80,8 +85,7 @@ class MultiplyConverter: public AbstractConverter {
 public:
     MultiplyConverter (boost::shared_ptr<AbstractConverter> converter, double factor);
     
-    virtual VectorOfDoubles apply ( const Typelib::Value& value, 
-                                    bool create_place_vector = false );
+    virtual VectorOfDoubles apply (void* data, bool create_place_vector = false);
 
     double getFactor() { return mFactor; }
     void setFactor (double factor) { mFactor = factor; }
@@ -91,7 +95,7 @@ public:
 class FlatConverter : public AbstractConverter, public VectorTocVisitor {
       
 protected:
-    const Typelib::Value* mpValue;
+    void* mpData;
     
     bool mCreatePlaceVector;
 
@@ -113,12 +117,7 @@ public:
 
     virtual ~FlatConverter ();
    
-    /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
-     *
-     * To get an eigen vector use getEigenVector after calling apply.
-     * \param create_place_vector \see getPlaceVector */ 
-    virtual VectorOfDoubles apply ( const Typelib::Value& value, 
-                                    bool create_place_vector = false );
+    virtual VectorOfDoubles apply (void* data, bool create_place_vector = false);
     
     /** Sets a slice. "" is no slice. */
     void setSlice (const std::string& slice);
@@ -157,12 +156,7 @@ public:
      */
     ConvertToVector ( const VectorToc& toc, const Typelib::Registry& registry);
 
-    /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
-     *
-     * To get an eigen vector use getEigenVector after calling apply.
-     * \param create_place_vector \see getPlaceVector */ 
-    VectorOfDoubles apply ( const Typelib::Value& value, 
-                            bool create_place_vector = false );
+    VectorOfDoubles apply (void* data, bool create_place_vector = false);
 };
 
 } // namespace general_processing

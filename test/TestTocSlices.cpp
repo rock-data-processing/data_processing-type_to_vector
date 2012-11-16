@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE( test_slice_convertion ) {
         dbl_vec.push_back(double(b.a));
         dbl_vec.push_back(double(b.b.b));
 
-        std::vector<double> res = ctv.apply(v, true);
+        std::vector<double> res = ctv.applyToValue(v, true);
 
         BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE( test_slice_convertion ) {
             dbl_vec.push_back(sa.A_vector[i].d);
         }
     
-        std::vector<double> res = ctv.apply(v);
+        std::vector<double> res = ctv.applyToValue(v);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE( test_slice_convertion ) {
             dbl_vec.push_back(cc.dbl_vv[i].a);
         }
 
-        std::vector<double> res = ctv.apply(v, true);
+        std::vector<double> res = ctv.applyToValue(v, true);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE( test_slice_convertion ) {
 
         FlatConverter fc(toc2);
         
-        std::vector<double> res = fc.apply(v);
+        std::vector<double> res = fc.applyToValue(v);
 
         BOOST_CHECK( res.size() == 1 );
         BOOST_CHECK( res[0] = ffst.b);
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_CASE( test_single_convert_multi_struct_slicing )
     std::vector<double> dbl_vec;
     dbl_vec.push_back(double(b.b.b));
 
-    std::vector<double> res = sc.apply(v, true);
+    std::vector<double> res = sc.applyToValue(v, true);
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 

@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE( test_convert_scalar )
         std::vector<double> dbl_vec;
         dbl_vec.push_back(f);
 
-        BOOST_CHECK( dbl_vec == ctv.apply(v) );
+        BOOST_CHECK( dbl_vec == ctv.applyToValue(v) );
         
         BOOST_TEST_CHECKPOINT("Testing double places");
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( test_convert_scalar )
         std::vector<double> dbl_vec;
         dbl_vec.push_back(i);
 
-        BOOST_CHECK( dbl_vec == ctv.apply(v) );
+        BOOST_CHECK( dbl_vec == ctv.applyToValue(v) );
     }
     
     {
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( test_convert_scalar )
         std::vector<double> dbl_vec;
         dbl_vec.push_back(c);
 
-        BOOST_CHECK( dbl_vec == ctv.apply(v) );
+        BOOST_CHECK( dbl_vec == ctv.applyToValue(v) );
     }
 
 }
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE( test_convert_array )
     std::vector<double> dbl_vec;
     for (int i=0; i<3; i++) dbl_vec.push_back(d[i]);
 
-    BOOST_CHECK( dbl_vec == ctv.apply(v, true) );
+    BOOST_CHECK( dbl_vec == ctv.applyToValue(v, true) );
         
     BOOST_TEST_CHECKPOINT("Testing double[3] places");
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE( test_convert_struct )
     dbl_vec.push_back(double(a.c));
     dbl_vec.push_back(double(a.d));
 
-    std::vector<double> res = ctv.apply(v, true);
+    std::vector<double> res = ctv.applyToValue(v, true);
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE( test_convert_multi_struct )
     dbl_vec.push_back(double(b.b.c));
     dbl_vec.push_back(double(b.b.d));
 
-    std::vector<double> res = ctv.apply(v, true);
+    std::vector<double> res = ctv.applyToValue(v, true);
 
     BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE( test_convert_container )
     {
         Value v(&int_vec, t);
     
-        std::vector<double> res = ctv.apply(v);
+        std::vector<double> res = ctv.applyToValue(v);
 
         BOOST_CHECK( res.empty() );
     }
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE( test_convert_container )
     
     std::vector<double> dbl_vec(int_vec.begin(), int_vec.end());
 
-    std::vector<double> res = ctv.apply(v);
+    std::vector<double> res = ctv.applyToValue(v);
 
     BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE( test_convert_string )
     
     std::vector<double> dbl_vec(str.begin(), str.end());
 
-    std::vector<double> res = ctv.apply(v);
+    std::vector<double> res = ctv.applyToValue(v);
 
     BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
         for (int i=0; i<dv.dbl_vector.size(); i++)
             dbl_vec.push_back(double(dv.dbl_vector[i]));
     
-        std::vector<double> res = ctv.apply(v);
+        std::vector<double> res = ctv.applyToValue(v);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
             for (int i=0; i<va.dbl_vector_array[j].size(); i++)
                 dbl_vec.push_back(va.dbl_vector_array[j][i]);
     
-        std::vector<double> res = ctv.apply(v, true);
+        std::vector<double> res = ctv.applyToValue(v, true);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -342,7 +342,7 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
             dbl_vec.push_back(sa.A_vector[i].d);
         }
     
-        std::vector<double> res = ctv.apply(v);
+        std::vector<double> res = ctv.applyToValue(v);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
                 dbl_vec.push_back(cc.dbl_vv[i].dbl_vector[j]);
         }
 
-        std::vector<double> res = ctv.apply(v, true);
+        std::vector<double> res = ctv.applyToValue(v, true);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -404,7 +404,7 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
 
         BOOST_CHECK( utilmm::join(places_list) == places );
         
-        ctv.apply(v, false);
+        ctv.applyToValue(v, false);
 
         BOOST_CHECK( ctv.getPlaceVector().empty() );
 
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {
 
         ctv.setSlice("1");
 
-        BOOST_CHECK( dbl_vec == ctv.apply(v, true) );
+        BOOST_CHECK( dbl_vec == ctv.applyToValue(v, true) );
             
         std::string places = "1";
 
@@ -480,7 +480,7 @@ BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {
         dbl_vec.push_back(d[15]);
         dbl_vec.push_back(d[17]);
 
-        BOOST_CHECK( dbl_vec == ctv.apply(v, true) );
+        BOOST_CHECK( dbl_vec == ctv.applyToValue(v, true) );
             
         std::string places = "1 12 13 15 17";
 
@@ -508,7 +508,7 @@ BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {
         dbl_vec.push_back(double(b.b.a));
         dbl_vec.push_back(double(b.b.c));
 
-        std::vector<double> res = ctv.apply(v, true);
+        std::vector<double> res = ctv.applyToValue(v, true);
 
         BOOST_REQUIRE ( res.size() == dbl_vec.size() );
 
@@ -546,7 +546,7 @@ BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {
         dbl_vec.push_back(double(str[9]));
         dbl_vec.push_back(double(str[10]));
 
-        std::vector<double> res = ctv.apply(v);
+        std::vector<double> res = ctv.applyToValue(v);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -578,7 +578,7 @@ BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {
             dbl_vec.push_back(sa.A_vector[i].a);
         }
     
-        std::vector<double> res = ctv.apply(v,false);
+        std::vector<double> res = ctv.applyToValue(v,false);
         
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
@@ -617,7 +617,7 @@ BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {
         dbl_vec.push_back(cc.dbl_vv[2].a);
         dbl_vec.push_back(cc.dbl_vv[2].dbl_vector[1]);
 
-        std::vector<double> res = ctv.apply(v, true);
+        std::vector<double> res = ctv.applyToValue(v, true);
 
         BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -666,7 +666,7 @@ BOOST_AUTO_TEST_CASE( test_multiply_converter )
             dbl_vec.push_back(cc.dbl_vv[i].dbl_vector[j] * 10.0);
     }
 
-    std::vector<double> res = mc.apply(v, true);
+    std::vector<double> res = mc.applyToValue(v, true);
 
     BOOST_REQUIRE( res.size() == dbl_vec.size() );
 
@@ -690,7 +690,7 @@ BOOST_AUTO_TEST_CASE( test_multiply_converter )
 
     BOOST_CHECK( utilmm::join(places_list) == places );
     
-    mc.apply(v, false);
+    mc.applyToValue(v, false);
 
     BOOST_CHECK( mc.getPlaceVector().empty() );
 

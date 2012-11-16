@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
 
         clock_t start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v);
+            std::vector<double> dbl_vec = ctv.applyToValue(v);
         clock_t end =  clock();
 
         printf("converting a double takes %.3f us\n",
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
 
         clock_t start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v);
+            std::vector<double> dbl_vec = ctv.applyToValue(v);
         clock_t end =  clock();
 
         printf("converting an int takes %.3f us\n",
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
 
         clock_t start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v);
+            std::vector<double> dbl_vec = ctv.applyToValue(v);
         clock_t end =  clock();
 
         printf("converting a char takes %.3f us\n",
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
         
         clock_t start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v);
+            std::vector<double> dbl_vec = ctv.applyToValue(v);
         clock_t end =  clock();
         
         printf("converting struct A takes %.3f us\n",
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
         
         start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v,true);
+            std::vector<double> dbl_vec = ctv.applyToValue(v,true);
         end =  clock();
         
         printf("converting struct A with creating a place vector takes %.3f us\n",
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
         
         start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = fc.apply(v);
+            std::vector<double> dbl_vec = fc.applyToValue(v);
         end =  clock();
         
         printf("flat converting struct A takes %.3f us\n",
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
 
         start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = fc.apply(v,true);
+            std::vector<double> dbl_vec = fc.applyToValue(v,true);
         end =  clock();
         
         printf("flat converting struct A with creating a place vector takes %.3f us\n",
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
     
         clock_t start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v);
+            std::vector<double> dbl_vec = ctv.applyToValue(v);
         clock_t end =  clock();
 
         int s1 = sa.A_vector.size();
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
         
         start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v2);
+            std::vector<double> dbl_vec = ctv.applyToValue(v2);
         end =  clock();
         
         int s2 = sa.A_vector.size();
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
     
         clock_t start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v);
+            std::vector<double> dbl_vec = ctv.applyToValue(v);
         clock_t end =  clock();
 
         int s1 = int_vec.size();
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE( test_timing )
         
         start =  clock();
         for ( int i = 0 ; i < nConvert; i++)
-            std::vector<double> dbl_vec = ctv.apply(v);
+            std::vector<double> dbl_vec = ctv.applyToValue(v);
         end =  clock();
         
         int s2 = int_vec.size();
