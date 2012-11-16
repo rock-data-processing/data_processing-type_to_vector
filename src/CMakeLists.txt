@@ -3,6 +3,7 @@ set(LIBSOURCES  Utilities.cpp
                 VectorTocMaker.cpp
                 Converter.cpp
                 SliceMatcher.cpp
+                VectorBuilder.cpp
 )
 
 set(LIBHEADERS  Utilities.hpp
@@ -10,8 +11,9 @@ set(LIBHEADERS  Utilities.hpp
                 VectorToc.hpp 
                 VectorTocMaker.hpp
                 NumericConverter.hpp
-                Converter.cpp
-                SliceMatcher.cpp
+                Converter.hpp
+                SliceMatcher.hpp
+                VectorBuilder.hpp
 )
 
 rock_library(general_processing
