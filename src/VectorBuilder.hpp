@@ -55,6 +55,8 @@ public:
 
     const VectorOfDoubles& getData(int idx) const;
 
+    const VectorToc& getToc(int idx) const { return mConverters.at(idx)->getToc(); }
+
     StringVector getPlaces(int idx) const;
 
     int size() const { return mConverters.size(); }

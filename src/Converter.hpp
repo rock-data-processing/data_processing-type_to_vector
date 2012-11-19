@@ -45,6 +45,8 @@ public:
     AbstractConverter (const VectorToc& toc) : mToc(toc) {}
 
     std::string getTypeName() { return mToc.mType; }
+
+    const VectorToc& getToc() { return mToc; }
     
     /** Applies the converter to a \c Typelib::Value and returns a vector of doubles.
      *
