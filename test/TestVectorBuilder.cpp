@@ -147,5 +147,32 @@ BOOST_AUTO_TEST_CASE( test_builder ) {
         BOOST_CHECK( builder.getVectorPosition(1,BIndex) == VectorPosition(1,1) );
         BOOST_CHECK( builder.getVectorPosition(1,ContainerIndex) == VectorPosition(2,2) );
     }
+    
+    {
+        int i = -11;
+        B b = { 123, { 13, 21, -81, 112} };
+        
+        builder.update(1, IntIndex, &i, true);
+        builder.update(1, BIndex, &b, true);
+        
+        double ref1[] = { -55, 11, 2, 81, 12 };
+        double ref2[] = { -11, 123, 45 };
+
+        BOOST_CHECK( builder.getVector(0) == VectorOfDoubles(ref1, ref1+5) );
+        BOOST_CHECK( builder.getVector(1) == VectorOfDoubles(ref2, ref2+3) );
+
+        std::string sref1[] = { "int", "B.b.a", "B.b.b", "B.b.c", "B.b.d" };
+        std::string sref2[] = { "int", "B.a", "Container.a" };
+        
+        BOOST_CHECK( builder.getPlaces(0) == StringVector(sref1, sref1+5) );
+        BOOST_CHECK( builder.getPlaces(1) == StringVector(sref2, sref2+3) );
+
+        BOOST_CHECK( builder.getVectorPosition(0,IntIndex) == VectorPosition(0,0) );
+        BOOST_CHECK( builder.getVectorPosition(0,BIndex) == VectorPosition(1,4) );
+        BOOST_CHECK( builder.getVectorPosition(0,ContainerIndex) == VectorPosition(5,4) );
+        BOOST_CHECK( builder.getVectorPosition(1,IntIndex) == VectorPosition(0,0) );
+        BOOST_CHECK( builder.getVectorPosition(1,BIndex) == VectorPosition(1,1) );
+        BOOST_CHECK( builder.getVectorPosition(1,ContainerIndex) == VectorPosition(2,2) );
+    }
 }
 

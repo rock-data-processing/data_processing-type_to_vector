@@ -22,7 +22,6 @@
 
 namespace general_processing {
 
-
 typedef std::vector<AbstractConverter::Pointer> Converters;
 typedef std::vector<VectorOfDoubles> DataVectors;
 
@@ -51,6 +50,8 @@ public:
     void update (const Typelib::Value& value, bool create_places=false);
 
     void update ( void* data, bool create_places=false);
+    
+    void update ( int converter_idx, void* data, bool create_places=false);
 
     const VectorOfDoubles& getData(int idx) const;
 
@@ -66,7 +67,11 @@ public:
 class DataVectorBuilder : public std::vector<VectorConversion> {
 
 public:
+    /** Updates all vectors. */
     void update(int vector_idx, void* data, bool create_places=false);
+
+    /** Only update vectors for a certain converter. */
+    void update(int converter_idx, int vector_idx, void* data, bool create_places=false);
 
     VectorOfDoubles getVector(int converter_idx) const;
     Eigen::MatrixXd getEigenVector(int converter_idx) const;

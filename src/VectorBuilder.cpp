@@ -34,6 +34,11 @@ void VectorConversion::update (void* data, bool create_places) {
         *dit = (*cit)->apply(data, create_places);
 }
 
+void VectorConversion::update (int converter_idx, void* data, bool create_places) {
+    
+    mData.at(converter_idx) = mConverters.at(converter_idx)->apply(data, create_places);
+}
+
 const VectorOfDoubles& VectorConversion::getData(int idx) const {
 
     return mData.at(idx);
@@ -47,6 +52,12 @@ StringVector VectorConversion::getPlaces(int idx) const {
 void DataVectorBuilder::update (int vector_idx, void* data, bool create_places) {
 
     at(vector_idx).update(data,create_places);
+}
+
+void DataVectorBuilder::update (int converter_idx, int vector_idx, void* data, 
+        bool create_places) {
+
+    at(vector_idx).update(converter_idx, data,create_places);
 }
 
 
