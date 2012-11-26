@@ -46,7 +46,7 @@ VectorOfDoubles SingleConverter::apply (void* data, bool create_place_vector) {
 }
 
 MultiplyConverter::MultiplyConverter (AbstractConverter::Pointer converter, 
-        double factor) : AbstractConverter(VectorToc()), mpConverter(converter), 
+        double factor) : AbstractConverter(converter->getToc()), mpConverter(converter), 
             mFactor(factor) {}
 
 VectorOfDoubles MultiplyConverter::apply (void* data, bool create_place_vector) {
