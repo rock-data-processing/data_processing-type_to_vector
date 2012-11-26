@@ -44,6 +44,7 @@ class VectorConversion {
 
 public:
     VectorConversion (std::string name) : mIdentifier(name) {}
+    VectorConversion () : mIdentifier("") {}
 
     int addConverter(AbstractConverter::Pointer converter_ptr);
 
@@ -61,6 +62,7 @@ public:
 
     int size() const { return mConverters.size(); }
 
+    void setName(const std::string& name) { mIdentifier = name; }
     std::string name() const { return mIdentifier; }
     std::string getTypeName() const { return mConverters.back()->getTypeName(); }
 };
