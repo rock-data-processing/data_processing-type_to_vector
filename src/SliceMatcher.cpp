@@ -1,12 +1,14 @@
 // \file  SliceMatcher.cpp
 
+#include <set>
+
 #include <boost/lexical_cast.hpp>
 
 #include "SliceMatcher.hpp"
 
 using namespace general_processing;
 
-SliceStore::SliceStore (const std::string& slice) {
+SliceStore::SliceStore (const std::string& slice, bool general) {
   
     mInverseSlices = slice[0] == '!';
 
@@ -18,23 +20,31 @@ SliceStore::SliceStore (const std::string& slice) {
         places = utilmm::split(slice," ");
 
     utilmm::stringlist::const_iterator it = places.begin();
+
+    typedef std::set<std::string> SliceSet;
+    SliceSet sset;
     
     for ( ; it != places.end(); it++ ) {
 
-        utilmm::stringlist concrete_places = replaceIndicesSlices(*it, mStarTokens);
+        utilmm::stringlist concrete_places = replaceIndicesSlices(*it, general);
 
         utilmm::stringlist::const_iterator pit = concrete_places.begin();
 
         for (; pit != concrete_places.end(); pit++ )
-            mPlaces.push_back((*pit)+"."); // stop with a . to not 1 matching 10
+            sset.insert((*pit)+"."); // stop with a . to not 1 matching 10
     }
+
+    mPlaces = StringVector(sset.begin(), sset.end());
 }
 
 
 SliceStore::IndexSlice SliceStore::getIndices( const std::string& slice ) {
     
-    size_t minus_pos = slice.find("-");
     IndexSlice idx_slice;
+
+    if (slice == "") return idx_slice;
+
+    size_t minus_pos = slice.find("-");
 
     if ( minus_pos != std::string::npos ) {
 
@@ -59,50 +69,53 @@ SliceStore::IndexSlice SliceStore::getIndices( const std::string& slice ) {
 
     } else {
 
-        // single index
         idx_slice.from = boost::lexical_cast<int>(slice);
-        idx_slice.to = idx_slice.from;     
+        idx_slice.to = idx_slice.from;
     }
 
     return idx_slice; 
 }
 
-StringVector SliceStore::resolveIndices (const std::string& str) {
+StringVector SliceStore::resolveIndices (const std::string& str, bool general) {
     
     if ( str[0] != '[' ) return StringVector();
 
     int n = str.length();
 
     if ( str[n-1] != ']' ) throw std::runtime_error("index slice must be in []");
+    
+    StringVector indices;
+
+    if (general) {
+        indices.push_back("*");
+        return indices;
+    }
 
     std::string slice = str.substr(1,n-2);
 
     utilmm::stringlist slices_list = utilmm::split(slice, ",");
+
+    if (slices_list.empty()) throw std::runtime_error("empty slice");
 
     utilmm::stringlist::const_iterator it = slices_list.begin();
 
     std::vector<IndexSlice> slices;
 
     for ( ; it != slices_list.end(); it++ )
-       slices.push_back(getIndices(*it));
+        slices.push_back(getIndices(*it));
 
     std::vector<IndexSlice>::const_iterator sit = slices.begin();
-
-    StringVector indices;
 
     for ( ; sit != slices.end(); sit++ ) {
 
         for ( int i=sit->from; i <= sit->to; i += sit->every )
-
             indices.push_back( boost::lexical_cast<std::string,int>(i) );
-
     }
 
     return indices;
-
 }
 
-StringVector SliceStore::makeDirectIndexSlice(const std::string& str, IntSet& star_toks ) {
+StringVector SliceStore::makeDirectIndexSlice(const std::string& str, bool general) {
             
     utilmm::stringlist tokens = utilmm::split(str, ".");
 
@@ -114,18 +127,13 @@ StringVector SliceStore::makeDirectIndexSlice(const std::string& str, IntSet& st
 
     for ( ; jt != tokens.end(); jt++, tok_idx++ ) {
 
-        if ( *jt == "*" ) {
-            star_toks.insert(tok_idx);
-            continue;
-        }
-
-        StringVector indices = resolveIndices (*jt);
+        StringVector indices = resolveIndices (*jt, general);
 
         if ( !indices.empty() ) {
 
             StringVector::const_iterator iit = indices.begin();
 
-            for ( ; iit<indices.end(); iit++) {
+            for ( ; iit != indices.end(); iit++) {
 
                 utilmm::stringlist::iterator jt_new = tokens.insert(jt,*iit);
 
@@ -145,8 +153,7 @@ StringVector SliceStore::makeDirectIndexSlice(const std::string& str, IntSet& st
     return result;
 }
 
-utilmm::stringlist SliceStore::replaceIndicesSlices(const std::string& str, 
-        IntSet& star_toks) {
+utilmm::stringlist SliceStore::replaceIndicesSlices(const std::string& str, bool general) {
 
     bool replaced = true;
 
@@ -161,9 +168,9 @@ utilmm::stringlist SliceStore::replaceIndicesSlices(const std::string& str,
 
         for ( ; it != str_list.end(); it++) {
 
-            StringVector replace_vector = makeDirectIndexSlice(*it, star_toks);
+            StringVector replace_vector = makeDirectIndexSlice(*it, general);
 
-            if ( replace_vector.size() > 1 && replace_vector.back() != *it ) {
+            if ( replace_vector.size() > 0 && replace_vector.back() != *it ) {
 
                 replaced = true;
 

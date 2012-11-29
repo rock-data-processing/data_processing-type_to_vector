@@ -35,17 +35,35 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
     BOOST_CHECK ( is.to == 101 );
     BOOST_CHECK ( is.every == 4 );
     
+    is = SliceStore::getIndices("");
+    
+    BOOST_CHECK ( is.from == -1 );
+    
+    BOOST_CHECK_THROW (SliceStore::getIndices("a"),boost::bad_lexical_cast); 
 
     BOOST_TEST_CHECKPOINT ("resolveIndices");
     
     {
-        std::vector<std::string> res = SliceStore::resolveIndices("position");
+        std::vector<std::string> res = SliceStore::resolveIndices("position",false);
 
         BOOST_CHECK(res.empty());
     }
+    
+    BOOST_CHECK_THROW (SliceStore::resolveIndices("[]",false),std::runtime_error);
+    BOOST_CHECK_THROW (SliceStore::resolveIndices("[,,]",false),std::runtime_error);
+         
+    {
+        std::vector<std::string> res = SliceStore::resolveIndices("[,4,,6,]",false);
+
+        std::vector<std::string> ref;
+        ref.push_back("4");
+        ref.push_back("6");
+
+        BOOST_CHECK(res == ref);
+    }
 
     {
-        std::vector<std::string> res = SliceStore::resolveIndices("[1,4,6]");
+        std::vector<std::string> res = SliceStore::resolveIndices("[1,4,6]",false);
 
         std::vector<std::string> ref;
         ref.push_back("1");
@@ -56,7 +74,16 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
     }
     
     {
-        std::vector<std::string> res = SliceStore::resolveIndices("[3-6]");
+        std::vector<std::string> res = SliceStore::resolveIndices("[1]",false);
+
+        std::vector<std::string> ref;
+        ref.push_back("1");
+
+        BOOST_CHECK(res == ref);
+    }
+    
+    {
+        std::vector<std::string> res = SliceStore::resolveIndices("[3-6]",false);
 
         std::vector<std::string> ref;
         ref.push_back("3");
@@ -68,7 +95,7 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
     }
     
     {
-        std::vector<std::string> res = SliceStore::resolveIndices("[3-10:3]");
+        std::vector<std::string> res = SliceStore::resolveIndices("[3-10:3]", false);
 
         std::vector<std::string> ref;
         ref.push_back("3");
@@ -79,7 +106,7 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
     }
     
     {
-        std::vector<std::string> res = SliceStore::resolveIndices("[1,3-10:3,11-13]");
+        std::vector<std::string> res = SliceStore::resolveIndices("[1,3-10:3,11-13]", false);
 
         std::vector<std::string> ref;
         ref.push_back("1");
@@ -92,25 +119,41 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
 
         BOOST_CHECK(res == ref);
     }
+    
+    {
+        std::vector<std::string> res = SliceStore::resolveIndices("[1,3-10:3,11-13]", true);
+
+        std::vector<std::string> ref;
+        ref.push_back("*");
+
+        BOOST_CHECK(res == ref);
+    }
 
     BOOST_TEST_CHECKPOINT( "makeDirectIndexSlice" );
 
     { 
-        IntSet stars;
         std::vector<std::string> res = 
-            SliceStore::makeDirectIndexSlice("a.2.b", stars);
+            SliceStore::makeDirectIndexSlice("a.2.b", false);
         
         std::vector<std::string> ref;
         ref.push_back("a.2.b");
 
         BOOST_CHECK(res == ref); 
-        BOOST_CHECK(stars.empty());
+    }
+    
+    { 
+        std::vector<std::string> res = 
+            SliceStore::makeDirectIndexSlice("a.[2].b", false);
+        
+        std::vector<std::string> ref;
+        ref.push_back("a.2.b");
+
+        BOOST_CHECK(res == ref); 
     }
 
     { 
-        IntSet stars;
         std::vector<std::string> res = 
-            SliceStore::makeDirectIndexSlice("a.[1,3-6:2].b",stars);
+            SliceStore::makeDirectIndexSlice("a.[1,3-6:2].b",false);
         
         std::vector<std::string> ref;
         ref.push_back("a.1.b");
@@ -118,13 +161,11 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
         ref.push_back("a.5.b");
 
         BOOST_CHECK(res == ref); 
-        BOOST_CHECK(stars.empty());
     }
     
     { 
-        IntSet stars;
         std::vector<std::string> res = 
-            SliceStore::makeDirectIndexSlice("a.[1,3-6:2].b.[10,11-13]",stars);
+            SliceStore::makeDirectIndexSlice("a.[1,3-6:2].b.[10,11-13]",false);
         
         std::vector<std::string> ref;
         ref.push_back("a.1.b.[10,11-13]");
@@ -135,26 +176,54 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
     }
     
     { 
-        IntSet stars;
         std::vector<std::string> res = 
-            SliceStore::makeDirectIndexSlice("a.*.b.*.[2,3].c.*.1",stars);
+            SliceStore::makeDirectIndexSlice("a.[1,3-6:2].b.[10,11-13]",true);
+        
+        std::vector<std::string> ref;
+        ref.push_back("a.*.b.[10,11-13]");
+
+        BOOST_CHECK(res == ref); 
+    }
+    
+    { 
+        std::vector<std::string> res = 
+            SliceStore::makeDirectIndexSlice("a.*.b.*.[2,3].c.*.1",false);
         
         std::vector<std::string> ref;
         ref.push_back("a.*.b.*.2.c.*.1");
         ref.push_back("a.*.b.*.3.c.*.1");
 
         BOOST_CHECK(res == ref); 
-        BOOST_CHECK(stars.size() == 2);
-        BOOST_CHECK(stars.count(1) == 1);
-        BOOST_CHECK(stars.count(3) == 1);
+    }
+    
+    { 
+        std::vector<std::string> res = 
+            SliceStore::makeDirectIndexSlice("a.*.b.*.[2,3].c.*.1",true);
+        
+        std::vector<std::string> ref;
+        ref.push_back("a.*.b.*.*.c.*.1");
+
+        BOOST_CHECK(res == ref); 
     }
 
     BOOST_TEST_CHECKPOINT( "replaceIndicesSlices" );
      
     { 
-        IntSet stars;
         utilmm::stringlist res = 
-            SliceStore::replaceIndicesSlices("a.[1,2].b",stars);
+            SliceStore::replaceIndicesSlices("a.[1].b",false);
+        
+        utilmm::stringlist ref;
+        ref.push_back("a.1.b");
+
+        BOOST_CHECK(res == ref); 
+    }
+    
+    BOOST_CHECK_THROW (SliceStore::replaceIndicesSlices("a.[].b",false),
+            std::runtime_error);
+    
+    { 
+        utilmm::stringlist res = 
+            SliceStore::replaceIndicesSlices("a.[1,2].b",false);
         
         utilmm::stringlist ref;
         ref.push_back("a.1.b");
@@ -164,9 +233,18 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
     }
     
     { 
-        IntSet stars;
         utilmm::stringlist res = 
-            SliceStore::replaceIndicesSlices("a.[1,3-6:2].b.[10,11-13]",stars);
+            SliceStore::replaceIndicesSlices("a.[1,2].b",true);
+        
+        utilmm::stringlist ref;
+        ref.push_back("a.*.b");
+
+        BOOST_CHECK(res == ref); 
+    }
+    
+    { 
+        utilmm::stringlist res = 
+            SliceStore::replaceIndicesSlices("a.[1,3-6:2].b.[10,11-13]",false);
  
         utilmm::stringlist ref;
         ref.push_back("a.1.b.10");
@@ -186,18 +264,24 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
     }
     
     { 
-        IntSet stars;
         utilmm::stringlist res = 
-            SliceStore::replaceIndicesSlices("a.*.[1,2].b.*",stars);
+            SliceStore::replaceIndicesSlices("a.[1,3-6:2].b.[10,11-13]",true);
+ 
+        utilmm::stringlist ref;
+        ref.push_back("a.*.b.*");
+
+        BOOST_CHECK(res == ref); 
+    }
+    
+    { 
+        utilmm::stringlist res = 
+            SliceStore::replaceIndicesSlices("a.*.[1,2].b.*",false);
         
         utilmm::stringlist ref;
         ref.push_back("a.*.1.b.*");
         ref.push_back("a.*.2.b.*");
 
         BOOST_CHECK(res == ref);
-        BOOST_CHECK(stars.size() == 2);
-        BOOST_CHECK(stars.count(1) == 1);
-        BOOST_CHECK(stars.count(4) == 1);
     }
     
     BOOST_TEST_CHECKPOINT( "SliceStore" );
@@ -250,6 +334,17 @@ BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
         ref.push_back("a.5.8.");
         ref.push_back("b.1.");
         ref.push_back("b.3.");
+        ref.push_back("c.");
+
+        BOOST_CHECK( ref == s.getPlaces() ); 
+    }
+    
+    { 
+        SliceStore s("a.[1,4-5].[1,8] b.[1,3] c", true); 
+        
+        std::vector<std::string> ref;
+        ref.push_back("a.*.*.");
+        ref.push_back("b.*.");
         ref.push_back("c.");
 
         BOOST_CHECK( ref == s.getPlaces() ); 
@@ -434,6 +529,35 @@ BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
         BOOST_CHECK ( !s.fitsASlice("b") );
         BOOST_CHECK ( s.fitsASlice("c") );
 
+        BOOST_CHECK ( s.fitsASlice("c.1") );
+        BOOST_CHECK ( s.fitsASlice("c.a") );
+    }
+    
+    { 
+        SliceMatcher s("a.[1,4-5].[1,8] b.[1,3] c", true); 
+        
+        std::vector<std::string> ref;
+        ref.push_back("a.*.*.");
+        ref.push_back("b.*.");
+        ref.push_back("c.");
+
+        BOOST_CHECK( ref == s.getSlices().getPlaces() );
+
+        for ( std::vector<std::string>::iterator it = ref.begin(); it< ref.end(); it++)
+            BOOST_CHECK( s.fitsASlice(*it) );
+
+        BOOST_CHECK ( !s.fitsASlice("a") );
+        BOOST_CHECK ( !s.fitsASlice("a.*") );
+        BOOST_CHECK ( !s.fitsASlice("a.1") );
+        BOOST_CHECK ( s.fitsASlice("a.*.*") );
+        BOOST_CHECK ( s.fitsASlice("a.2.10") );
+        
+        BOOST_CHECK ( !s.fitsASlice("b") );
+        BOOST_CHECK ( s.fitsASlice("b.*") );
+        BOOST_CHECK ( s.fitsASlice("b.3") );
+        BOOST_CHECK ( s.fitsASlice("b.1.c.4") );
+
+        BOOST_CHECK ( s.fitsASlice("c") );
         BOOST_CHECK ( s.fitsASlice("c.1") );
         BOOST_CHECK ( s.fitsASlice("c.a") );
     }

@@ -86,6 +86,8 @@ BOOST_AUTO_TEST_CASE( test_vectortocslicer ) {
         const Type& t = *registry.get("/B");
 
         VectorToc toc = VectorTocMaker().apply(t);
+        
+        BOOST_CHECK( toc.isFlat() );
 
         std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
         utilmm::stringlist sl(ptoc.begin(), ptoc.end());
@@ -110,6 +112,8 @@ BOOST_AUTO_TEST_CASE( test_vectortocslicer ) {
         
         VectorToc toc = VectorTocMaker().apply(t);
         
+        BOOST_CHECK( !toc.isFlat() );
+        
         std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
         utilmm::stringlist sl(ptoc.begin(), ptoc.end());
         BOOST_CHECK ( utilmm::join(sl) == 
@@ -117,6 +121,8 @@ BOOST_AUTO_TEST_CASE( test_vectortocslicer ) {
 
         VectorToc toc2 = VectorTocSlicer::slice(toc,"A_vector.*");
         
+        BOOST_CHECK( !toc2.isFlat() );
+
         ptoc = PlainTocVisitor().apply(toc2);
         utilmm::stringlist sl2(ptoc.begin(), ptoc.end());
         BOOST_CHECK ( utilmm::join(sl2) == 
@@ -126,7 +132,13 @@ BOOST_AUTO_TEST_CASE( test_vectortocslicer ) {
         
         ptoc = PlainTocVisitor().apply(toc3);
         utilmm::stringlist sl3(ptoc.begin(), ptoc.end());
-        BOOST_CHECK ( utilmm::join(sl3) == "A_vector.*.d" ); 
+        BOOST_CHECK ( utilmm::join(sl3) == "A_vector.*.d" );      
+        
+        VectorToc toc4 = VectorTocSlicer::slice(toc,"A_vector.[1-3].d");
+        
+        ptoc = PlainTocVisitor().apply(toc4);
+        utilmm::stringlist sl4(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl4) == "A_vector.*.d" );      
     }
     
     BOOST_TEST_CHECKPOINT("slice ContainerContainer");
@@ -151,6 +163,8 @@ BOOST_AUTO_TEST_CASE( test_vectortocslicer ) {
         const Type& t = *registry.get("/ForFlatSliceTest");
         
         VectorToc toc = VectorTocMaker().apply(t);
+
+        BOOST_CHECK( !toc.isFlat() );
         
         std::vector<std::string> ptoc = PlainTocVisitor().apply(toc);
         utilmm::stringlist sl(ptoc.begin(), ptoc.end());
@@ -158,9 +172,15 @@ BOOST_AUTO_TEST_CASE( test_vectortocslicer ) {
         
         VectorToc toc2 = VectorTocSlicer::slice(toc,"vec b");
         
+        BOOST_CHECK( !toc2.isFlat() );
+        
         ptoc = PlainTocVisitor().apply(toc2);
         utilmm::stringlist sl2(ptoc.begin(), ptoc.end());
         BOOST_CHECK ( utilmm::join(sl2) == "vec.* b");
+        
+        VectorToc toc3 = VectorTocSlicer::slice(toc,"a b");
+        
+        BOOST_CHECK( toc3.isFlat() );
     }
    
 }

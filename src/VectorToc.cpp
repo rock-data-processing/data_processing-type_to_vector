@@ -113,7 +113,7 @@ VectorToc VectorTocSlicer::apply(const std::string& slice) {
         delete mpMatcher;
         mpMatcher = 0;
     }
-    if (slice != "") mpMatcher = new SliceMatcher(slice); 
+    if (slice != "") mpMatcher = new SliceMatcher(slice, true); 
 
     mResultStack.clear();
     mResultStack.push_back(VectorToc());

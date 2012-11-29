@@ -14,15 +14,11 @@
 #ifndef GENERALPROCESSING_SLICEMATCHER_HPP
 #define GENERALPROCESSING_SLICEMATCHER_HPP
 
-#include <set>
-
 #include <utilmm/stringtools.hh>
 
 #include "Definitions.hpp"
 
 namespace general_processing {
-
-typedef std::set<unsigned int> IntSet;
 
 /** Takes a slice and store it in a way that a match can be find easily. 
  *
@@ -61,7 +57,6 @@ typedef std::set<unsigned int> IntSet;
 class SliceStore {
 
     StringVector mPlaces; //!< Valid places;
-    IntSet mStarTokens; //!< Tokens indices at which stars are found.
     bool mInverseSlices; //!< The members of the slice should not be in here.
 
 public:
@@ -74,16 +69,16 @@ public:
     };
 
 
-    SliceStore (const std::string& slice);
-   
+    /** Constructs a the slices for a slice.
+     *
+     * \param general if true numeric slices will not be resolved but replaced by
+     * a '*'. */
+    SliceStore (const std::string& slice, bool general=false);
 
     bool empty () { return mPlaces.empty(); }
 
     /** A const reference to the stored places. */
     const StringVector& getPlaces () const { return mPlaces; }
-
-    /** A set of indices at which a star is in the slice description. */
-    const IntSet& getStarTokens () const { return mStarTokens; }
 
     /** Returns ture if the stored slices should not be in a vector.*/
     bool isInverse() { return mInverseSlices; }
@@ -94,20 +89,20 @@ public:
     /** Resolves an indices slice to the list of valid indices.
      *
      * e.g. "[1-3]" -> "1", "2", "3" 
+     * \param general if true, "[1-3]" -> "*"
      * \returns empty vector if it was no slice. */
-    static StringVector resolveIndices (const std::string& str);
+    static StringVector resolveIndices (const std::string& str, bool general);
 
     /** Creates all possible slices form index descriptons for the first index slice.
      *
      * e.g. "d.[1-2].a.[2,5] -> "d.1.a.[2,5]" "d.2.a.[2,5]" 
-     * \param star_toks the token indices of stars will be added here. */
-    static StringVector makeDirectIndexSlice (const std::string& str, IntSet& star_toks);
+     * \param general if true something like "d.[1-2].a.[2,5]" will be "d.*.a.[2,5]". */
+    static StringVector makeDirectIndexSlice (const std::string& str, bool general);
 
-    /** Replaces each string with index slices with multiple strings for the i
+    /** Replaces each string with index slices with multiple strings for the
      *  allowed indices. 
      */
-    static utilmm::stringlist replaceIndicesSlices (const std::string& str,
-            IntSet& star_toks);
+    static utilmm::stringlist replaceIndicesSlices (const std::string& str, bool general);
 };
 
 /** The slice matcher checks whether a place description fits one of its slices. */
@@ -117,7 +112,7 @@ class SliceMatcher {
 
 public:
 
-    SliceMatcher(const std::string& slice) : mSlices(slice) {}
+    SliceMatcher(const std::string& slice, bool general=false) : mSlices(slice,general) {}
     
     /** Checks whether a place fits at least one slice or not. */
     bool fitsASlice(const std::string& place);
