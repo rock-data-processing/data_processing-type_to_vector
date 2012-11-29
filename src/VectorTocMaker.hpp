@@ -26,14 +26,13 @@ namespace general_processing {
 
 /** Finds out where in the vector to find which part of the \c Typelib::Type. */
 class VectorTocMaker: public Typelib::TypeVisitor {
+
+    typedef std::vector<unsigned int> UIntVector;
     
     VectorToc mToc;
     utilmm::stringlist mPlaceStack;
-    unsigned int mPosition; //!< Position in the data.
-    unsigned int mLastSize;
-    std::vector<unsigned int> mOffsetStack; //!< Last offset in case of a field
-    unsigned int mDelta; //!< Delta between to field offsets
-
+    UIntVector mPositionStack; //!< Position in the data.
+    
     void push_valueinfo(Typelib::Type const& type);
     void push_container(Typelib::Type const& type, VectorTocPointer toc_ptr);
 
@@ -47,7 +46,6 @@ protected:
     virtual bool visit_ (Typelib::Array const& type);
     virtual bool visit_ (Typelib::Container const& type);
 
-    virtual bool visit_ (Typelib::Compound const& type);
     virtual bool visit_ (Typelib::Compound const& type,Typelib::Field const& field);
 
 public:

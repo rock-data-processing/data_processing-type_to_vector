@@ -57,6 +57,11 @@ struct ForFlatSliceTest {
     int b;
 };
 
+struct TwoArrays {
+    int a[3];
+    int b[5];
+};
+
 
 #endif // GENERALPROCESSING_TESTTYPES_H
 

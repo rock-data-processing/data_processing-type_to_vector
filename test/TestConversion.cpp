@@ -418,6 +418,24 @@ BOOST_AUTO_TEST_CASE( test_convert_advanced )
         BOOST_CHECK ( x == ctv.getEigenVector() );
 
     }
+
+    BOOST_CHECKPOINT("Test TwoArrays");
+    {
+        const Type& t = *registry.get("/TwoArrays");
+
+        TwoArrays a = {{1,2,3},{4,5,6,7,8}};
+
+        VectorToc toc = VectorTocMaker().apply(t);
+
+        ConvertToVector ctv(toc,registry);
+
+        std::vector<double> res = ctv.apply(&a, true);
+        
+        std::vector<double> dbl_vec;
+        for (int i=1; i<=8; i++) dbl_vec.push_back(i);
+
+        BOOST_CHECK( res == dbl_vec );
+    }
 }
 
 BOOST_AUTO_TEST_CASE( test_convert_with_slice ) {

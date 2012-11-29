@@ -10,29 +10,22 @@ VectorTocMaker::VectorTocMaker() {}
 
 void VectorTocMaker::push_valueinfo(Typelib::Type const& type) {
 
-    if (mDelta) mPosition += mDelta;
-    else mPosition += mLastSize;
-
     VectorValueInfo info;
 
     info.placeDescription = utilmm::join(mPlaceStack,".");
-    info.position = mPosition;
+    info.position = mPositionStack.back(); //position();
     info.castFun = getCastFunction(type);
     info.containerType = "";
+        
     mToc.push_back(info);
-
-    mLastSize = type.getSize();
 }
 
 void VectorTocMaker::push_container(Typelib::Type const& type ,VectorTocPointer toc_ptr ) {
     
-    if (mDelta) mPosition += mDelta;
-    else mPosition += mLastSize;
-
     VectorValueInfo info;
 
     info.placeDescription = utilmm::join(mPlaceStack,".");
-    info.position = mPosition;
+    info.position = mPositionStack.back(); //position();
     info.castFun = 0;
     info.content = toc_ptr;
     info.containerType = type.getName();
@@ -42,21 +35,11 @@ void VectorTocMaker::push_container(Typelib::Type const& type ,VectorTocPointer 
 
 bool VectorTocMaker::visit_ (Typelib::NullType const& type) {
 
-    if (mDelta) mPosition += mDelta;
-    else mPosition += mLastSize;
-
-    mLastSize = type.getSize();
-
     return Typelib::TypeVisitor::visit_(type); 
 }
 
 bool VectorTocMaker::visit_ (Typelib::OpaqueType const& type) { 
     
-    if (mDelta) mPosition += mDelta;
-    else mPosition += mLastSize;
-
-    mLastSize = type.getSize();
-
     return true; 
 }
 
@@ -76,14 +59,21 @@ bool VectorTocMaker::visit_ (Typelib::Pointer const& type) {
 
 bool VectorTocMaker::visit_ (Typelib::Array const& type) {
 
+    mPositionStack.push_back(mPositionStack.back());
+    
     for (unsigned int i=0; i<type.getDimension(); i++ ) {
-        std::stringstream ss;
-        ss << i;
-        mPlaceStack.push_back(ss.str());
+
+        mPlaceStack.push_back(boost::lexical_cast<std::string>(i));
+
         bool result = Typelib::TypeVisitor::visit_(type);
+        mPositionStack.back() += type.getIndirection().getSize();
+
         mPlaceStack.pop_back();
         if (!result) return false;
     }
+
+    mPositionStack.pop_back();
+
     return true;
 }
 
@@ -97,51 +87,21 @@ bool VectorTocMaker::visit_ (Typelib::Container const& type) {
 
     push_container(type, p_toc); 
 
-    mLastSize = type.getSize();    
-    
     mPlaceStack.pop_back();
 
     return true;
-}
-
-bool VectorTocMaker::visit_ (Typelib::Compound const& type) {
-
-    // for when there is a compund within a compound
-    if (mDelta) {
-        mPosition += mDelta;
-        mDelta = 0;
-        mLastSize = 0;
-    } else {
-        mPosition += mLastSize;
-        mLastSize = 0;
-    }
-
-    mOffsetStack.push_back(0);
-
-    bool result = Typelib::TypeVisitor::visit_(type);
-
-    mOffsetStack.pop_back();
-
-    return result;
 }
 
 bool VectorTocMaker::visit_ (Typelib::Compound const& type, 
     Typelib::Field const& field) { 
    
     mPlaceStack.push_back(field.getName());
-
-    unsigned int offset = field.getOffset();
-
-    if (offset) {
-        mDelta = offset - mOffsetStack.back();
-        mOffsetStack.back() = offset;
-    } else
-        mDelta = 0;
+    mPositionStack.push_back(mPositionStack.back() + field.getOffset());
 
     bool result = Typelib::TypeVisitor::visit_(type, field);
 
     mPlaceStack.pop_back();
-    mDelta = 0;
+    mPositionStack.pop_back();
 
     return result;
 }
@@ -150,10 +110,8 @@ VectorToc VectorTocMaker::apply (Typelib::Type const& type) {
     mToc.clear();
     mToc.mType = type.getName();
     mPlaceStack.clear();
-    mPosition = 0;
-    mOffsetStack.clear();
-    mDelta = 0;
-    mLastSize = 0;
+    mPositionStack.clear();
+    mPositionStack.push_back(0);
     Typelib::TypeVisitor::visit_(type); 
     return mToc; 
 }
