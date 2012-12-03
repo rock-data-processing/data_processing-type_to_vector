@@ -4,6 +4,7 @@ set(LIBSOURCES  Utilities.cpp
                 Converter.cpp
                 SliceMatcher.cpp
                 VectorBuilder.cpp
+                MatrixBuffer.cpp
 )
 
 set(LIBHEADERS  Utilities.hpp
@@ -14,6 +15,7 @@ set(LIBHEADERS  Utilities.hpp
                 Converter.hpp
                 SliceMatcher.hpp
                 VectorBuilder.hpp
+                MatrixBuffer.hpp
 )
 
 rock_library(general_processing
