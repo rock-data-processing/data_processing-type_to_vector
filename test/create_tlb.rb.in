@@ -1,3 +1,4 @@
 require "typelib"
+Typelib.load_type_plugins = false
 
 puts Typelib::Registry.import("@CMAKE_SOURCE_DIR@/test/TestTypes.h").to_xml
