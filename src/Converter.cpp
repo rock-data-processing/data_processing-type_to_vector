@@ -23,8 +23,7 @@ Eigen::VectorXd AbstractConverter::getEigenVector () {
 
     Eigen::VectorXd result;
 
-    if (!mVector.empty()) 
-        result = Eigen::Map<Eigen::VectorXd>(&(mVector[0]), mVector.size());
+    getEigenVector(result);
 
     return result;
 }

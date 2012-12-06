@@ -70,6 +70,8 @@ public:
 /** Builds vector from several types. */
 class DataVectorBuilder : public std::vector<VectorConversion> {
 
+    VectorOfDoubles mStore;
+
 public:
     /** Updates all vectors. */
     void update(int vector_idx, void* data, bool create_places=false);
@@ -77,14 +79,28 @@ public:
     /** Only update vectors for a certain converter. */
     void update(int converter_idx, int vector_idx, void* data, bool create_places=false);
 
-    VectorOfDoubles getVector(int converter_idx) const;
-    Eigen::MatrixXd getEigenVector(int converter_idx) const;
+    const VectorOfDoubles& getVector(int converter_idx);
+    Eigen::VectorXd getEigenVector(int converter_idx);
+    
+    template<typename Derived>
+    bool getEigenVector(int converter_idx, Eigen::DenseBase<Derived>& vector){
+    
+        const VectorOfDoubles& vec = getVector(converter_idx);
+
+        if (!vec.empty()) {
+            vector = Eigen::Map<const Eigen::VectorXd>((&vec[0]), vec.size());
+            return true;
+        }
+        else return false; 
+    }
 
     StringVector getPlaces(int converter_idx) const;
 
     VectorPosition getVectorPosition(int converter_idx, int vector_idx) const;
 
     int getVectorIdx(std::string vector_id) const;
+
+    int getVectorSize(int conveter_idx) const;
 };
 
 }

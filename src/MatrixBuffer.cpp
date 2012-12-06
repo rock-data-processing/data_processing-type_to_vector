@@ -33,13 +33,18 @@ bool MatrixBuffer::pushVector (const Eigen::VectorXd& v) {
     return false;
 }
 
+const Eigen::MatrixXd& AbstractMatrixBuffer::getMatrix (int from, int to) {
+    fillOutMatrix(from,to);
+    return mOutMatrix;
+}
+
 void MatrixBuffer::resetBuffer() {
 
     mMatrix = Eigen::MatrixXd::Zero(vectorSize,vectorCount);
     mInIdx = vectorCount;
 }
     
-void MatrixBuffer::getMatrix (int from, int to, Eigen::MatrixXd& matrix) {
+void MatrixBuffer::fillOutMatrix (int from, int to) {
 
     if ( from < 0 ) from += vectorCount;
     if ( to < 0 ) to += vectorCount;
@@ -55,14 +60,14 @@ void MatrixBuffer::getMatrix (int from, int to, Eigen::MatrixXd& matrix) {
 
     if (from > vectorCount-1) {
 
-        matrix = mMatrix.block(0,from-vectorCount,vectorSize,n);
+        mOutMatrix = mMatrix.block(0,from-vectorCount,vectorSize,n);
 
     } else if ( to > vectorCount-1 ) {
 
-        matrix.resize(vectorSize,n);
-        matrix << mMatrix.block(0,from,vectorSize,vectorCount-from),
+        mOutMatrix.resize(vectorSize,n);
+        mOutMatrix << mMatrix.block(0,from,vectorSize,vectorCount-from),
             mMatrix.block(0,0,vectorSize,to-vectorCount+1);
 
     } else
-        matrix = mMatrix.block(0,from,vectorSize,n); 
+        mOutMatrix = mMatrix.block(0,from,vectorSize,n); 
 }

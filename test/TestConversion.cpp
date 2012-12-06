@@ -719,4 +719,8 @@ BOOST_AUTO_TEST_CASE( test_multiply_converter )
         x[i] = dbl_vec[i];
 
     BOOST_CHECK ( x == mc.getEigenVector() );
+
+    Eigen::Matrix<double, -1, -1, 2> vec;
+    BOOST_CHECK ( mc.getEigenVector(vec) );
+    BOOST_CHECK ( (x-vec).norm() < 0.0001 );
 }

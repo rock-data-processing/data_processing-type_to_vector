@@ -1,7 +1,6 @@
 <package>
   <description brief="Elements needed for the general data processing.">
-      Elements to enable the general data processing like type to vector conversion or 
-      a learning interface.
+      Elements to enable the general data processing like a type to vector conversion.
   </description>
   <author>Felix Rehrmann/felix.rehrmann@dfki.de</author>
   <license></license>
@@ -10,5 +9,5 @@
   <depend package="typelib" />
   <depend package="utilmm" />
   <depend package="eigen3" />
-  <depden package="boost" />
+  <depend package="boost" />
 </package>

@@ -63,6 +63,19 @@ public:
     
     /** Returns the result of the last conversion as an Eigen::VectorXd. */
     Eigen::VectorXd getEigenVector ();
+
+    /** To get the result of the last conversion. 
+     *
+     * \returns false if there are no data in the vector.*/
+    template <typename Derived>
+    bool getEigenVector(Eigen::DenseBase<Derived>& vector) const {
+
+       if ( !mVector.empty() ) {
+           vector = Eigen::Map<const Eigen::VectorXd>(&(mVector[0]), mVector.size());
+           return true;
+        } else
+            return false;
+    }
     
     /** Returns a vector of string that describes what the conversion results actually 
      *  contains. 

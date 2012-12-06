@@ -61,52 +61,39 @@ void DataVectorBuilder::update (int converter_idx, int vector_idx, void* data,
 }
 
 
-VectorOfDoubles DataVectorBuilder::getVector (int converter_idx) const {
+const VectorOfDoubles& DataVectorBuilder::getVector (int converter_idx) {
 
-    const_iterator it = begin();
-    int size = 0;
+    mStore.clear();
+    mStore.reserve(getVectorSize(converter_idx));
 
-    for ( ; it != end(); it++)
-        size += it->getData(converter_idx).size();
-
-    VectorOfDoubles result;
-    result.reserve(size);
-
-    for ( it = begin(); it != end(); it++) {
+    for ( const_iterator it = begin(); it != end(); it++) {
         const VectorOfDoubles& vec = it->getData(converter_idx);
-        result.insert(result.end(), vec.begin(), vec.end());
+        mStore.insert(mStore.end(), vec.begin(), vec.end());
     }
 
-    return result; 
+    return mStore; 
 }
 
-Eigen::MatrixXd DataVectorBuilder::getEigenVector (int converter_idx) const {
+Eigen::VectorXd DataVectorBuilder::getEigenVector (int converter_idx) {
     
     Eigen::VectorXd result;
-    VectorOfDoubles vec;
 
-    vec = getVector(converter_idx);
-
-    if (!vec.empty()) 
-        result = Eigen::Map<Eigen::VectorXd>(&(vec[0]), vec.size());
+    getEigenVector(converter_idx,result);
 
     return result;
 }
 
 StringVector DataVectorBuilder::getPlaces(int converter_idx) const {
     
-    int size = 0;
+    int size = getVectorSize(converter_idx);
     
     const_iterator it = begin();
-
-    for ( ; it != end(); it++)
-        size += it->getData(converter_idx).size();
 
     StringVector result;
     result.resize(size, std::string(20,' '));
 
     int i = 0;
-    for ( it = begin(); it != end(); it++) {
+    for ( ; it != end(); it++) {
 
         StringVector vec = it->getPlaces(converter_idx);
         StringVector::const_iterator sit = vec.begin();
@@ -144,4 +131,14 @@ int DataVectorBuilder::getVectorIdx (std::string vector_id) const {
         if ( it->name() == vector_id ) return i;
 
     return -1;
+}
+
+int DataVectorBuilder::getVectorSize(int converter_idx) const {
+    const_iterator it = begin();
+    int size = 0;
+
+    for ( ; it != end(); it++)
+        size += it->getData(converter_idx).size();
+
+    return size;
 }

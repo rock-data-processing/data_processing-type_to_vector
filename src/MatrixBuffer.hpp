@@ -24,6 +24,7 @@ class AbstractMatrixBuffer {
 protected:
     int vectorSize, vectorCount;
     int pushCount;
+    Eigen::MatrixXd mOutMatrix;
 
     /** Push a vector to the buffer. 
      *
@@ -32,6 +33,9 @@ protected:
     
     /** Reset the buffer. */
     virtual void resetBuffer() = 0;
+   
+    /** Fill the requested values into mOutMatrix. */ 
+    virtual void fillOutMatrix (int from, int to) = 0;
 
 public:
 
@@ -43,13 +47,24 @@ public:
      * returns true if resize has been necessary.*/
     bool push (const Eigen::VectorXd& v);
 
-    /** Get a matrix from the buffer. Must provide matrix object.
+    /** Get a matrix from the buffer.
      *
-     * Get the matrix that from \p from to \p to, where 0 is the most recent pushed 
-     * vector and \c vectorCount-1 is the oldes vector. 
+     * Get the matrix from \p from to \p to, where 0 is the most recent pushed 
+     * vector and \c vectorCount-1 is the oldest vector. 
      * Negative values count from the end: \p to = -1 is \p to = \p vectorCount-1.
      */
-    virtual void getMatrix (int from, int to, Eigen::MatrixXd& matrix) = 0;
+    const Eigen::MatrixXd& getMatrix(int from, int to);
+    
+    /** Get a matrix from the buffer.
+     *
+     * Get the matrix from \p from to \p to, where 0 is the most recent pushed 
+     * vector and \c vectorCount-1 is the oldest vector. 
+     * Negative values count from the end: \p to = -1 is \p to = \p vectorCount-1.
+     */
+    template<typename Derived>
+    void getMatrix(int from, int to, Eigen::DenseBase<Derived>& mat) {
+        mat = getMatrix(from, to);
+    }
 
     /** Reset the buffer. */
     void reset();
@@ -73,13 +88,14 @@ protected:
     virtual bool pushVector(const Eigen::VectorXd& v);
     
     virtual void resetBuffer();  
+    
+    virtual void fillOutMatrix (int from, int to);
 
 public:
     MatrixBuffer (int vector_size, int vector_count) :  
         AbstractMatrixBuffer(vector_size, vector_count), mInIdx(vectorCount),
         mMatrix(Eigen::MatrixXd::Zero(vector_size, vector_count))  {}
 
-    virtual void getMatrix (int from, int to, Eigen::MatrixXd& matrix);
 };
 
 }
