@@ -118,7 +118,8 @@ VectorToc VectorTocSlicer::apply(const std::string& slice) {
     mResultStack.clear();
     mResultStack.push_back(VectorToc());
     mResultStack.back().mType = mToc.mType;
-    mResultStack.back().mSlice = mToc.mSlice + "|" + slice;
+    if ( slice != "")
+        mResultStack.back().mSlice = mToc.mSlice + "|" + slice;
 
     VectorTocVisitor::visit(mToc);
     
