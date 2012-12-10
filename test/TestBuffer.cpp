@@ -14,13 +14,16 @@ BOOST_AUTO_TEST_CASE( test_matrix_buffer ) {
 
     BOOST_CHECK ( bm.getPushCount() == 0 ); 
     BOOST_CHECK ( !bm.isFilled() );
+    
+    MatrixXd m1;
 
+    bm.getMatrix(0,-1,m1);
+    
     VectorXd v0 = VectorXd::Zero(4);
     VectorXd v1 = VectorXd::Ones(4);
 
     bm.push(v1);
 
-    MatrixXd m1;
 
     bm.getMatrix(0,0,m1);
 

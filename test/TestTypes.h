@@ -62,6 +62,16 @@ struct TwoArrays {
     int b[5];
 };
 
+struct DocA {
+    double a[3];
+    int b;
+    char c;
+};
+struct DocB {
+    int idx;
+    DocA data[5];
+};
+
 
 #endif // GENERALPROCESSING_TESTTYPES_H
 

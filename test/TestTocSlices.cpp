@@ -358,3 +358,41 @@ BOOST_AUTO_TEST_CASE( test_single_convert_multi_struct_slicing )
 
     BOOST_CHECK( utilmm::join(places_list) == places );
 }
+
+BOOST_AUTO_TEST_CASE( test_doc_slices )
+{
+    Registry registry;
+    import_types(registry);
+
+    const Type& t = *registry.get("/DocB");
+
+    VectorToc toc = VectorTocMaker().apply(t);
+        
+    BOOST_CHECK ( toc == toc );
+
+    VectorToc toc_ = toc;
+
+    BOOST_CHECK ( toc == toc_ );
+
+    std::string slices = "data|data.[0,2].b|idx data.*.b|data.*.c|! idx data.*.b|!";
+    utilmm::stringlist sll = utilmm::split(slices,"|");
+    StringVector sl(sll.begin(),sll.end());
+
+    {
+        VectorToc toc2 = VectorTocSlicer::slice(toc,"");
+
+        BOOST_CHECK ( toc == toc2 );
+    }
+
+    {
+        VectorToc toc2 = VectorTocSlicer::slice(toc,sl[1]);
+        
+        std::vector<std::string> ptoc = PlainTocVisitor().apply(toc2);
+        utilmm::stringlist sl(ptoc.begin(), ptoc.end());
+        BOOST_CHECK ( utilmm::join(sl) == "data.0.b data.2.b" );
+    
+        std::cout << utilmm::join(sl) << std::endl;
+    }
+
+
+}
