@@ -80,7 +80,7 @@ public:
     VectorTocVisitor(int max_depth=-1) : mMaxDepth(max_depth), mDepth(0) {}
 };
 
-class SliceMatcher;
+class SliceTree;
 
 /** Generates a VectorToc by slicing another VectorToc.
  *
@@ -92,7 +92,7 @@ class VectorTocSlicer : public VectorTocVisitor {
     std::vector<VectorToc> mResultStack;
     utilmm::stringlist mPlaceStack;
 
-    SliceMatcher* mpMatcher;
+    SliceTree* mpMatcher;
 
     void push_element (const VectorValueInfo& info);
 

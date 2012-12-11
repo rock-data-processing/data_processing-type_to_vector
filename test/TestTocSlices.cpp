@@ -390,8 +390,6 @@ BOOST_AUTO_TEST_CASE( test_doc_slices )
         std::vector<std::string> ptoc = PlainTocVisitor().apply(toc2);
         utilmm::stringlist sl(ptoc.begin(), ptoc.end());
         BOOST_CHECK ( utilmm::join(sl) == "data.0.b data.2.b" );
-    
-        std::cout << utilmm::join(sl) << std::endl;
     }
 
 
