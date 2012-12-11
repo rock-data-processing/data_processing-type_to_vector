@@ -620,3 +620,88 @@ BOOST_AUTO_TEST_CASE ( test_slice_inslice ) {
         BOOST_CHECK ( !s.fitsASlice("d.12.b.2.10.d") );
     }
 }
+
+BOOST_AUTO_TEST_CASE ( test_slice_tree ) 
+{
+   
+    SliceNode n1("place");
+
+    BOOST_CHECK( !n1.isCountable() );
+    BOOST_CHECK( !n1.isIn(12) );
+
+    n1 = SliceNode("*");
+    
+    BOOST_CHECK( n1.isCountable() );
+    BOOST_CHECK( n1.isIn(12) );
+    
+    n1 = SliceNode("[1,5,7-8,10-17:2]");
+    
+    BOOST_CHECK( n1.isCountable() );
+    BOOST_CHECK( !n1.isIn(0) );
+    BOOST_CHECK( n1.isIn(1) );
+    BOOST_CHECK( n1.isIn(5) );
+    BOOST_CHECK( !n1.isIn(6) );
+    BOOST_CHECK( n1.isIn(7) );
+    BOOST_CHECK( n1.isIn(8) );
+    BOOST_CHECK( n1.isIn(10) );
+    BOOST_CHECK( n1.isIn(12) );
+    BOOST_CHECK( !n1.isIn(13) );
+    BOOST_CHECK( n1.isIn(14) );
+    BOOST_CHECK( n1.isIn(16) );
+    BOOST_CHECK( !n1.isIn(17) );
+
+    BOOST_TEST_CHECKPOINT ( "SliceTree" );
+    
+    SliceTree t1("start.idx start.[1,4-6].a start.[1,4-6].b start.*.c zwei");
+
+    //std::cout << t1.toString() << std::endl;
+
+    BOOST_CHECK( t1.fitsASlice("start.idx") );
+    BOOST_CHECK( t1.fitsASlice("start.1.a") );
+    BOOST_CHECK( t1.fitsASlice("start.5.a") );
+    BOOST_CHECK( t1.fitsASlice("start.1.b") );
+    BOOST_CHECK( t1.fitsASlice("start.4.b") );
+    BOOST_CHECK( t1.fitsASlice("start.8.c") );
+    BOOST_CHECK( t1.fitsASlice("zwei") );
+    BOOST_CHECK( t1.fitsASlice("start.idx.2.a") );
+    BOOST_CHECK( t1.fitsASlice("start.idx.val") );
+    BOOST_CHECK( t1.fitsASlice("zwei.idx") );
+    BOOST_CHECK( !t1.fitsASlice("drei") );
+    BOOST_CHECK( !t1.fitsASlice("start.value") );
+    BOOST_CHECK( !t1.fitsASlice("start.2.a") );
+    BOOST_CHECK( !t1.fitsASlice("start.1.d") );
+    BOOST_CHECK( !t1.fitsASlice("start.1") );
+
+    t1 = SliceTree("a.1 a.3.b.2");
+
+    //std::cout << t1.toString() << std::endl;
+    
+    BOOST_CHECK( t1.fitsASlice("a.1") );
+    BOOST_CHECK( t1.fitsASlice("a.1.b.2") );
+    BOOST_CHECK( !t1.fitsASlice("a.2.b.2") );
+    BOOST_CHECK( !t1.fitsASlice("a.3.c") );
+    BOOST_CHECK( !t1.fitsASlice("a.3") );
+    BOOST_CHECK( t1.fitsASlice("a.3.b.2") );
+    
+    t1 = SliceTree("b.1 a.3.b.2");
+
+    // containers
+    BOOST_CHECK( t1.fitsASlice("b.*"));
+    BOOST_CHECK( t1.fitsASlice("a.*.b.2"));
+    BOOST_CHECK( t1.fitsASlice("a.3.b.*"));
+    BOOST_CHECK( t1.fitsASlice("a.*.b.*"));
+    BOOST_CHECK( !t1.fitsASlice("a.2.b.*"));
+    BOOST_CHECK( !t1.fitsASlice("a.*.c"));
+    BOOST_CHECK( !t1.fitsASlice("a.*.b.1"));
+    
+    t1 = SliceTree("! a.1 a.3.b.2");
+
+    //std::cout << t1.toString() << std::endl;
+    
+    BOOST_CHECK( !t1.fitsASlice("a.1") );
+    BOOST_CHECK( !t1.fitsASlice("a.1.b.2") );
+    BOOST_CHECK( t1.fitsASlice("a.2.b.2") );
+    BOOST_CHECK( t1.fitsASlice("a.3.c") );
+    BOOST_CHECK( t1.fitsASlice("a.3") );
+    BOOST_CHECK( !t1.fitsASlice("a.3.b.2") );
+}

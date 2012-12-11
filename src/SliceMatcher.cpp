@@ -189,7 +189,6 @@ utilmm::stringlist SliceStore::replaceIndicesSlices(const std::string& str, bool
     return str_list;
 }
 
-
 bool SliceMatcher::fitsASlice (const std::string& place) {
 
     std::string place_dot = place + ".";
@@ -279,3 +278,171 @@ bool SliceMatcher::isInteger (const std::string& str) {
 }
 
 
+SliceNode& SliceNodeVector::insert (const SliceNode& node) {
+
+    SliceNodeVector::iterator it = begin();
+
+    for ( it; it != end(); it++)
+        if ( it->place == node.place ) return *it;
+
+    push_back(node);
+
+    return back();
+}
+
+
+SliceNode::SliceNode(const std::string& slice_token) {
+    
+    place = slice_token;
+    indices = resolveToIndices(slice_token);
+}
+
+bool SliceNode::isCountable() const {
+    return place == "*" || !indices.empty();
+}
+
+bool SliceNode::isIn(int index) const {
+
+    if (place == "*") return true;
+    if (indices.empty()) return false;
+
+    IndexSlices::const_iterator it = indices.begin();
+
+    for ( ; it != indices.end(); it++ ) {
+        if ( index >= it->from && index <= it->to && (index - it->from)%it->every == 0 )
+            return true;
+    }
+
+    return false;
+}
+
+IndexSlices SliceNode::resolveToIndices(const std::string& slice_token) {
+    
+    if ( slice_token[0] != '[' ) {
+
+        try {
+            int index = boost::lexical_cast<int>(slice_token);
+
+            IndexSlices result;
+            result.push_back(SliceStore::IndexSlice(index));
+
+            return result;
+
+        } catch ( boost::bad_lexical_cast&) {
+            return IndexSlices();
+        }
+    }
+
+    int n = slice_token.length();
+
+    if ( slice_token[n-1] != ']' ) throw std::runtime_error("index slice must be in []");
+
+    std::string slice = slice_token.substr(1,n-2);
+
+    utilmm::stringlist slices_list = utilmm::split(slice, ",");
+
+    if (slices_list.empty()) throw std::runtime_error("resolveToIndices: empty slice");
+
+    utilmm::stringlist::const_iterator it = slices_list.begin();
+
+    IndexSlices result;
+
+    for ( ; it != slices_list.end(); it++ )
+        result.push_back(SliceStore::getIndices(*it));
+
+    return result;
+}
+
+
+SliceTree::SliceTree(const std::string& slice_str) {
+    
+    mInverse = slice_str[0] == '!';
+
+    utilmm::stringlist places;
+
+    if ( mInverse )
+        places = utilmm::split(slice_str.substr(1), " ");
+    else
+        places = utilmm::split(slice_str," ");
+
+    utilmm::stringlist::const_iterator sit = places.begin();
+
+    for ( ; sit != places.end(); sit++ ) addBranch(*this, *sit);
+}
+
+void SliceTree::addBranch(SliceNode& node, const std::string& slice) {
+
+    size_t dot = slice.find('.');
+
+    SliceNode& next = node.childs.insert( SliceNode(slice.substr(0,dot)) );
+
+    if (dot != std::string::npos) addBranch(next, slice.substr(dot+1));
+}
+
+bool SliceTree::fitsASlice(const std::string& place_str) {
+
+    utilmm::stringlist sl = utilmm::split(place_str,".");
+    mPlaceTokens = StringVector(sl.begin(),sl.end());
+    mTokIt = mPlaceTokens.begin();
+
+    if (placeIsBranch(*this)) return !mInverse;
+    else return mInverse;
+}
+
+bool SliceTree::placeIsBranch(const SliceNode& node) {
+
+    if (node.childs.empty()) return true;
+    
+    if ( mTokIt == mPlaceTokens.end() ) return false;
+    
+    try {
+
+        int index = boost::lexical_cast<int>(*mTokIt);
+
+        mTokIt++;
+        
+        SliceNodeVector::const_iterator it = node.childs.begin();
+
+        for ( ; it != node.childs.end(); it++ )
+            if (it->isIn(index)) 
+                if (placeIsBranch(*it)) return true;
+
+    } catch (boost::bad_lexical_cast&) {
+
+        std::string tok = *mTokIt;
+        
+        mTokIt++;
+       
+        SliceNodeVector::const_iterator it = node.childs.begin();
+
+        for ( ; it != node.childs.end(); it++ )
+            if ( tok == it->place || ( tok == "*" && it->isCountable() ) )
+                if ( placeIsBranch(*it) ) return true;
+    }
+    
+    return false;
+}
+
+std::string SliceNode::toString(const SliceNode& node) {
+
+    static int indent=0;
+
+    std::string res(indent,'.');
+    res += node.place + '\n';
+
+    indent++;
+    for ( SliceNodeVector::const_iterator it = node.childs.begin(); it != node.childs.end(); it++ )
+        res += toString(*it);
+    indent--;
+
+    return res;
+}
+
+std::string SliceNode::toString() {
+    std::string res;
+
+    for ( SliceNodeVector::const_iterator it = childs.begin(); it != childs.end(); it++ )
+        res += SliceNode::toString(*it);
+
+    return res;
+}

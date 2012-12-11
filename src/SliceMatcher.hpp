@@ -14,6 +14,8 @@
 #ifndef GENERALPROCESSING_SLICEMATCHER_HPP
 #define GENERALPROCESSING_SLICEMATCHER_HPP
 
+#include <vector>
+
 #include <utilmm/stringtools.hh>
 
 #include "Definitions.hpp"
@@ -66,6 +68,9 @@ public:
         int to;
         int every;
         IndexSlice() : from(-1), to(-1), every(1) {}
+        IndexSlice(int i) : from(i), to(i), every(1) {}
+        IndexSlice(int i, int j) : from(i), to(j), every(1) {}
+        IndexSlice(int i, int j, int k) : from(i), to(j), every(k) {}
     };
 
 
@@ -104,7 +109,7 @@ public:
      */
     static utilmm::stringlist replaceIndicesSlices (const std::string& str, bool general);
 };
-
+    
 /** The slice matcher checks whether a place description fits one of its slices. */
 class SliceMatcher {
 
@@ -126,6 +131,60 @@ public:
 
     static bool isInteger (const std::string& str);
 
+};
+
+struct SliceNode;
+
+struct SliceNodeVector : public std::vector<SliceNode> {
+    SliceNode& insert(const SliceNode& node);
+};
+
+typedef std::vector<SliceStore::IndexSlice> IndexSlices;
+
+/** One node in the slice tree.
+ *
+ * - Some name: \b position
+ * - Any index: \b * 
+ * - An index slice: \b [1,4,7-100:2] */
+struct SliceNode {
+    std::string place;
+    IndexSlices indices;
+    SliceNodeVector childs;
+
+    SliceNode() {}
+    SliceNode(const std::string& slice_token);
+
+    bool isCountable() const;
+    bool isIn(int index) const;
+
+    bool operator== (const SliceNode& other) const { return place == other.place; }
+
+    /** Takes a string like [2,3,4-6:2] and creates a vector of indexSlice from it. 
+     *
+     * \returns an empty vector if the token is not an index slice.*/
+    static IndexSlices resolveToIndices(const std::string& slice_token);
+    
+    std::string toString();
+    static std::string toString(const SliceNode& node);
+};
+
+/** A slice represented as tree. */
+struct SliceTree : public SliceNode {
+
+    SliceTree(const std::string& slice_str);
+    
+    static void addBranch(SliceNode& node, const std::string& slice);
+
+    bool fitsASlice(const std::string& place_str);
+
+
+protected:
+    bool placeIsBranch(const SliceNode& node);
+    
+private:
+    StringVector mPlaceTokens;
+    StringVector::const_iterator mTokIt;
+    bool mInverse;
 };
 
 } // namespace general_processing
