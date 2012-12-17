@@ -3,12 +3,9 @@
  *
  * \brief Matches a position in a type to a slice description.
  *
- *      German Research Center for Artificial Intelligence\n
- *      Project: VirGo4
+ * \todo benchmark SliceMatcher vs. SliceTree
+ * \todo replace SliceMatcher by SliceTree, if latter is faster
  *
- * \date 30.10.2012
- *
- * \author felix.rehrmann@dfki.de
  */
 
 #ifndef GENERALPROCESSING_SLICEMATCHER_HPP

@@ -1,14 +1,10 @@
 /**
  * \file VectorToc.hpp
  *
- * \brief Converting typelib types to an vector (flatten it).
+ * \brief To describe the content with conversion specific informations of a type.
  *
- *      German Research Center for Artificial Intelligence\n
- *      Project: VirGo4
  *
- * \date 16.10.2012
- *
- * \author felix.rehrmann@dfki.de
+ * \todo use hashes instead of strings to describe the place in a type.
  */
 
 #ifndef GENERALPROCESSING_VECTORTOC_HPP
