@@ -6,7 +6,7 @@
 #include "MatrixBuffer.hpp"
 
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 bool AbstractMatrixBuffer::push (const Eigen::VectorXd& v) {
     bool result = pushVector(v);

@@ -7,8 +7,8 @@
  * \todo use hashes instead of strings to describe the place in a type.
  */
 
-#ifndef GENERALPROCESSING_VECTORTOC_HPP
-#define GENERALPROCESSING_VECTORTOC_HPP
+#ifndef TYPETOVECTOR_VECTORTOC_HPP
+#define TYPETOVECTOR_VECTORTOC_HPP
 
 #include <string>
 #include <vector>
@@ -19,7 +19,7 @@
 
 #include "NumericConverter.hpp"
 
-namespace general_processing {
+namespace type_to_vector {
 
 struct VectorToc;
 typedef boost::shared_ptr<VectorToc> VectorTocPointer;
@@ -107,6 +107,6 @@ public:
 
 
 
-} // namespace general_processing
-#endif // GENERALPROCESSING_VECTORTOC_HPP
+} // namespace type_to_vector
+#endif // TYPETOVECTOR_VECTORTOC_HPP
 

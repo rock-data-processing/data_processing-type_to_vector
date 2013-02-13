@@ -11,12 +11,12 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef GENERALPROCESSING_MATRIXBUFFER_HPP
-#define GENERALPROCESSING_MATRIXBUFFER_HPP
+#ifndef TYPETOVECTOR_MATRIXBUFFER_HPP
+#define TYPETOVECTOR_MATRIXBUFFER_HPP
 
 #include <Eigen/Core>;
 
-namespace general_processing {
+namespace type_to_vector {
 
 /** A buffer to hold a time series of vectors and provides a block of them as matrix. */
 class AbstractMatrixBuffer {
@@ -99,4 +99,4 @@ public:
 };
 
 }
-#endif // GENERALPROCESSING_MATRIXBUFFER_HPP
+#endif // TYPETOVECTOR_MATRIXBUFFER_HPP

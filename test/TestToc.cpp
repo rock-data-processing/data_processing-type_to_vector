@@ -5,7 +5,7 @@
 #include <Utilities.hpp>
 #include <VectorToc.hpp>
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 VectorValueInfo makeInfo(const std::string& descr, unsigned int position,
         VectorToc* content=0) {

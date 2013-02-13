@@ -11,19 +11,19 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef GENERALPROCESSING_DEFINITIONS_HPP
-#define GENERALPROCESSING_DEFINITIONS_HPP
+#ifndef TYPETOVECTOR_DEFINITIONS_HPP
+#define TYPETOVECTOR_DEFINITIONS_HPP
 
 #include <vector>
 #include <string>
 
-namespace general_processing {
+namespace type_to_vector {
 
 typedef std::vector<std::string> StringVector;
 
 typedef std::vector<double> VectorOfDoubles;
 
-} // namesspace general_processing
+} // namesspace type_to_vector
 
-#endif // GENERALPROCESSING_DEFINITIONS_HPP
+#endif // TYPETOVECTOR_DEFINITIONS_HPP
 

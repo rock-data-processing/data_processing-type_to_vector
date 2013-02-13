@@ -11,12 +11,12 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef GENERALPROCESSING_NUMERIVCONVERTER_HPP
-#define GENERALPROCESSING_NUMERIVCONVERTER_HPP
+#ifndef TYPETOVECTOR_NUMERIVCONVERTER_HPP
+#define TYPETOVECTOR_NUMERIVCONVERTER_HPP
 
 #include <typelib/typemodel.hh>
 
-namespace general_processing {
+namespace type_to_vector {
 
 typedef double (*CastFunction)(void*);
 
@@ -88,7 +88,7 @@ static CastFunction getCastFunction(Typelib::Type const& type) {
     }
 }
 
-} // namespace general_processing
+} // namespace type_to_vector
 
-#endif // GENERALPROCESSING_NUMERIVCONVERTER_HPP
+#endif // TYPETOVECTOR_NUMERIVCONVERTER_HPP
 

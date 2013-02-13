@@ -11,8 +11,8 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef GENERALPROCESSING_UTILITIES_HPP
-#define GENERALPROCESSING_UTILITIES_HPP
+#ifndef TYPETOVECTOR_UTILITIES_HPP
+#define TYPETOVECTOR_UTILITIES_HPP
 
 #include <iostream>
 #include <vector>
@@ -21,10 +21,10 @@
 #include <utilmm/stringtools.hh>
 #include "VectorToc.hpp"
 
-std::ostream& operator<< (std::ostream& os, const general_processing::VectorValueInfo& info);
-std::ostream& operator<< (std::ostream& os, const general_processing::VectorToc& toc);
+std::ostream& operator<< (std::ostream& os, const type_to_vector::VectorValueInfo& info);
+std::ostream& operator<< (std::ostream& os, const type_to_vector::VectorToc& toc);
 
-namespace general_processing {
+namespace type_to_vector {
 
 /** Converts a toc into a vector of strings. */
 class PlainTocVisitor : public VectorTocVisitor {
@@ -67,8 +67,8 @@ bool operator== (const VectorToc& one,
 inline bool operator!= (const VectorToc& one, 
         const VectorToc& two) { return !operator==(one,two); }
 
-} // namespace general_processing
+} // namespace type_to_vector
 
 
 
-#endif //  GENERALPROCESSING_UTILITIES_HPP
+#endif //  TYPETOVECTOR_UTILITIES_HPP

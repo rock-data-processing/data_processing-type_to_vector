@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef GENERALPROCESSING_SLICEMATCHER_HPP
-#define GENERALPROCESSING_SLICEMATCHER_HPP
+#ifndef TYPETOVECTOR_SLICEMATCHER_HPP
+#define TYPETOVECTOR_SLICEMATCHER_HPP
 
 #include <vector>
 
@@ -17,7 +17,7 @@
 
 #include "Definitions.hpp"
 
-namespace general_processing {
+namespace type_to_vector {
 
 /** Takes a slice and store it in a way that a match can be find easily. 
  *
@@ -184,7 +184,7 @@ private:
     bool mInverse;
 };
 
-} // namespace general_processing
+} // namespace type_to_vector
 
-#endif //  GENERALPROCESSING_SLICEMATCHER_HPP
+#endif //  TYPETOVECTOR_SLICEMATCHER_HPP
 

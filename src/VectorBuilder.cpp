@@ -4,7 +4,7 @@
 
 #include "VectorBuilder.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 int VectorConversion::addConverter (AbstractConverter::Pointer converter_ptr) {
 

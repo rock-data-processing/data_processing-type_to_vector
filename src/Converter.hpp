@@ -11,8 +11,8 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef GENERALPROCESSING_CONVERTER_HPP
-#define GENERALPROCESSING_CONVERTER_HPP
+#ifndef TYPETOVECTOR_CONVERTER_HPP
+#define TYPETOVECTOR_CONVERTER_HPP
 
 #include <Eigen/Core>
 #include <typelib/value.hh>
@@ -24,7 +24,7 @@
 
 class Typelib::Registry;
 
-namespace general_processing {
+namespace type_to_vector {
 
 class SliceMatcher;
 
@@ -177,8 +177,8 @@ public:
     VectorOfDoubles apply (void* data, bool create_place_vector = false);
 };
 
-} // namespace general_processing
+} // namespace type_to_vector
 
-#endif // GENERALPROCESSING_CONVERTER_HPP
+#endif // TYPETOVECTOR_CONVERTER_HPP
 
 

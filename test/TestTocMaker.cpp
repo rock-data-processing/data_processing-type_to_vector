@@ -12,7 +12,7 @@
 #include "VectorToc.hpp"
 #include "NumericConverter.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 using namespace Typelib;
 
 

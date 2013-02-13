@@ -17,9 +17,9 @@
 #include "TestTypes.h"
 
 using namespace Typelib;
-using namespace general_processing;
+using namespace type_to_vector;
 
-namespace general_processing {
+namespace type_to_vector {
     bool operator== (const VectorPosition& one, const VectorPosition& another) {
         return one.start == another.start && one.end == another.end;
     }

@@ -18,7 +18,7 @@ set(LIBHEADERS  Utilities.hpp
                 MatrixBuffer.hpp
 )
 
-rock_library(general_processing
+rock_library(type_to_vector
     SOURCES ${LIBSOURCES}
     HEADERS ${LIBHEADERS}
     DEPS_PKGCONFIG typelib eigen3)

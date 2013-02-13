@@ -4,7 +4,7 @@
 
 #include "VectorTocMaker.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 VectorTocMaker::VectorTocMaker() {}
 

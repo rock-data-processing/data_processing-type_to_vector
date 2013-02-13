@@ -6,7 +6,7 @@
 
 #include "SliceMatcher.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 SliceStore::SliceStore (const std::string& slice, bool general) {
   

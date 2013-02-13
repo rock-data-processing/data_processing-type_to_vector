@@ -11,7 +11,7 @@
 
 #include "SliceMatcher.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 BOOST_AUTO_TEST_CASE ( test_slice_methods ) {
 

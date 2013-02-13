@@ -11,8 +11,8 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef GENERAPROCESSING_VECTORBUILDER_HPP
-#define GENERAPROCESSING_VECTORBUILDER_HPP
+#ifndef TYPETOVECTOR_VECTORBUILDER_HPP
+#define TYPETOVECTOR_VECTORBUILDER_HPP
 
 #include <vector>
 #include <string>
@@ -20,7 +20,7 @@
 #include "Definitions.hpp"
 #include "Converter.hpp"
 
-namespace general_processing {
+namespace type_to_vector {
 
 typedef std::vector<AbstractConverter::Pointer> Converters;
 typedef std::vector<VectorOfDoubles> DataVectors;
@@ -105,6 +105,6 @@ public:
 
 }
 
-#endif // GENERAPROCESSING_VECTORBUILDER_HPP
+#endif // TYPETOVECTOR_VECTORBUILDER_HPP
 
 

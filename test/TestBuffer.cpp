@@ -4,7 +4,7 @@
 
 #include "MatrixBuffer.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 using namespace Eigen;
 
 BOOST_AUTO_TEST_CASE( test_matrix_buffer ) {

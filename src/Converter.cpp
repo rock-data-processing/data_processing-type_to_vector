@@ -8,7 +8,7 @@
 
 #include "Converter.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 VectorOfDoubles AbstractConverter::applyToValue (const Typelib::Value& value,
         bool create_place_vector) {

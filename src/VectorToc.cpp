@@ -6,7 +6,7 @@
 
 #include "VectorToc.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 VectorValueInfo::VectorValueInfo() : 
     placeDescription(""), position(0), castFun(0) {}

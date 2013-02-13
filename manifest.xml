@@ -1,6 +1,6 @@
 <package>
-  <description brief="Elements needed for the general data processing.">
-      Elements to enable the general data processing like a type to vector conversion.
+  <description brief="Converts types into vectors.">
+      Puts the values of types used in rock for transport into a double vector.
   </description>
   <author>Felix Rehrmann/felix.rehrmann@dfki.de</author>
   <license></license>

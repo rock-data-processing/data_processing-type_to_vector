@@ -11,8 +11,8 @@
  * \author felix.rehrmann@dfki.de
  */
 
-#ifndef GENERALPROCESSING_VECTORTOCMAKER_HPP
-#define GENERALPROCESSING_VECTORTOCMAKER_HPP
+#ifndef TYPETOVECTOR_VECTORTOCMAKER_HPP
+#define TYPETOVECTOR_VECTORTOCMAKER_HPP
 
 #include <vector>
 
@@ -22,7 +22,7 @@
 
 #include "VectorToc.hpp"
 
-namespace general_processing {
+namespace type_to_vector {
 
 /** Finds out where in the vector to find which part of the \c Typelib::Type. */
 class VectorTocMaker: public Typelib::TypeVisitor {
@@ -53,7 +53,7 @@ public:
     VectorToc apply (Typelib::Type const& type);
 };
 
-} // namespace general_processing
+} // namespace type_to_vector
 
-#endif // GENERALPROCESSING_VECTORTOCMAKER_HPP
+#endif // TYPETOVECTOR_VECTORTOCMAKER_HPP
 

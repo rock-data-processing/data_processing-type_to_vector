@@ -23,21 +23,21 @@ set(TESTFILES   TestSuite.cpp
                 TestBuffer.cpp
 )
 
-rock_executable( general_processing_test
+rock_executable( type_to_vector_test
     SOURCES ${TESTFILES}
-    DEPS general_processing
+    DEPS type_to_vector
     DEPS_CMAKE Boost
     NOINSTALL)
 
-target_link_libraries(general_processing_test boost_system)
+target_link_libraries(type_to_vector_test boost_system)
 
-add_custom_command( TARGET general_processing_test POST_BUILD
+add_custom_command( TARGET type_to_vector_test POST_BUILD
     COMMAND "ruby" ARGS "create_tlb.rb" ">" "TestTypes.tlb") 
 
-rock_executable( general_processing_timing
+rock_executable( type_to_vector_timing
     SOURCES TestSuite.cpp Timing.cpp  
-    DEPS general_processing
+    DEPS type_to_vector
     DEPS_CMAKE Boost
     NOINSTALL)
 
-target_link_libraries(general_processing_timing boost_system)
+target_link_libraries(type_to_vector_timing boost_system)

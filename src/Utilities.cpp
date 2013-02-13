@@ -2,7 +2,7 @@
 
 #include "Utilities.hpp"
 
-using namespace general_processing;
+using namespace type_to_vector;
 
 std::ostream& operator<< (std::ostream& os, const VectorValueInfo& info) {
     os << info.placeDescription << ":" << info.position
@@ -92,7 +92,7 @@ bool EqualityVisitor::apply(const VectorToc& other) {
 }
 
 
-bool general_processing::operator== (const VectorToc& one, const VectorToc& two) {
+bool type_to_vector::operator== (const VectorToc& one, const VectorToc& two) {
     EqualityVisitor ev(one);
     return ev.apply(two);
 }
