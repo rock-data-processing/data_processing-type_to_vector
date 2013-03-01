@@ -29,8 +29,6 @@ rock_executable( type_to_vector_test
     DEPS_CMAKE Boost
     NOINSTALL)
 
-target_link_libraries(type_to_vector_test boost_system)
-
 add_custom_command( TARGET type_to_vector_test POST_BUILD
     COMMAND "ruby" ARGS "create_tlb.rb" ">" "TestTypes.tlb") 
 
@@ -40,4 +38,3 @@ rock_executable( type_to_vector_timing
     DEPS_CMAKE Boost
     NOINSTALL)
 
-target_link_libraries(type_to_vector_timing boost_system)
