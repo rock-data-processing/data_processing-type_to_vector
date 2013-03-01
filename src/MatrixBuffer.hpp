@@ -14,7 +14,7 @@
 #ifndef TYPETOVECTOR_MATRIXBUFFER_HPP
 #define TYPETOVECTOR_MATRIXBUFFER_HPP
 
-#include <Eigen/Core>;
+#include <Eigen/Core>
 
 namespace type_to_vector {
 
