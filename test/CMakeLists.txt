@@ -38,3 +38,8 @@ rock_executable( type_to_vector_timing
     DEPS_CMAKE Boost
     NOINSTALL)
 
+rock_executable( slice_timing_cmp
+    SOURCES SliceTiming.cpp  
+    DEPS type_to_vector
+    NOINSTALL)
+
