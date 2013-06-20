@@ -59,6 +59,7 @@ public:
     void setSlice(const std::string& slice);
 
 protected:
+    virtual void* getPosition(const VectorValueInfo& info);
     virtual void setElement(const VectorValueInfo& info);
     virtual void visit(const VectorValueInfo& info);
 
@@ -68,30 +69,10 @@ protected:
     unsigned int mElementCounter;
 };
 
-/** Give the size of a conatiner. */
-class ContainerSizeDefs : public std::map<std::string, unsigned int> {
-
-public:
-    /** Sets a size for a position.
-     *
-     * \param position The position string in the type.
-     * \param container_size The lenght of the container.
-     */
-    void setSize(const std::string& position, unsigned int container_size) {
-        insert(std::pair<std::string,  unsigned int>(position, container_size));
-    }
-};
-
 /** Fill the type with data from a vector. 
  *
- * Containers sizes must be given, either by presizing the container, 
- * or by giving the size of the containters in the type.
- *
- * Container sizing behaves as follows:
- * 1. If no sizes are given, the containers will keep their size and filled up 
- *    to that size.
- * 2. If sizes are given, the container will be resized to the size and filled 
- *    with up to the given size with values.
+ * Containers are take as they are. That means they will not be resized and
+ * resizing of containers in a type has to be done prior to back conversion.
  *  
  * The elements of a type will be set to the vector values as long as values
  * remain. The filling stops when either the type ends or there are no values in 
@@ -103,15 +84,17 @@ public:
     BackConverter(const VectorToc& toc, const Typelib::Registry& registry) : 
         FlatBackConverter(toc), mrRegistry(registry) {}
 
-    /** Returning the map to define the container sizes. */
-    ContainerSizeDefs& containerSizes() { return mContainerSizes; }
-
+    virtual void apply(const VectorOfDoubles& vec, void* data);
 
 protected:
+    virtual void* getPosition(const VectorValueInfo& info);
+    virtual void setElement(const VectorValueInfo&);
     virtual void visit(const VectorValueInfo& info);
     
     const Typelib::Registry& mrRegistry;    
-    ContainerSizeDefs mContainerSizes;
+    std::vector<void*> mBaseStack;
+    std::vector<int> mContainersSizeStack;
+    utilmm::stringlist mPlaceStack;
 };
 
 } // namespace type_to_vector

@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(test_backconvert_scalar)
         BackConverter bctv(toc, registry);
         bctv.apply(dbl_vec, &c);
         BOOST_TEST_CHECKPOINT("BackConverter for char");
-        BOOST_CHECK( c == 3 );
+        BOOST_CHECK( c == 5 );
     }
 
 }
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE( test_backconvert_container )
         BOOST_TEST_CHECKPOINT("FlatBack does not touch a container");
         BOOST_CHECK( i2_vec.size() == 2);
         BOOST_CHECK( i2_vec[0] == 20);
-        BOOST_CHECK( i2_vec[2] == -12);
+        BOOST_CHECK( i2_vec[1] == -12);
     }
     {
         std::vector<int> i2_vec;
@@ -221,21 +221,8 @@ BOOST_AUTO_TEST_CASE( test_backconvert_container )
         BOOST_CHECK( i2_vec.size() == 4);
         BOOST_CHECK( i2_vec[0] == -10);
         BOOST_CHECK( i2_vec[1] == 22);
-        BOOST_CHECK( i2_vec[1] == 3);
-        BOOST_CHECK( i2_vec[1] == -2041);
-    }
-    for (int i = 0; i <= 4; i++) {
-        std::vector<int> i2_vec;
-        if (i > 0) i2_vec.resize(i);
-
-        BackConverter bctv(toc, registry);
-        bctv.containerSizes().setSize("",3);
-        bctv.apply(dbl_vec, &i2_vec);
-        BOOST_TEST_CHECKPOINT("BackConvert a container and set size, initial size = " << i);
-        BOOST_REQUIRE( i2_vec.size() == 3);
-        BOOST_CHECK( i2_vec[0] == -10);
-        BOOST_CHECK( i2_vec[1] == 22);
         BOOST_CHECK( i2_vec[2] == 3);
+        BOOST_CHECK( i2_vec[3] == -2041);
     }
 }
 
@@ -248,16 +235,20 @@ BOOST_AUTO_TEST_CASE( test_backconvert_string )
     std::string str = "Hello world!";
     std::vector<double> dbl_vec(str.begin(), str.end());
 
+    BackConverter bctv(toc, registry);
+
     for (int i = 0; i <= 15; i += 3) {
         std::string str2;
         if (i > 0) str2.resize(i,'x');
 
-        BackConverter bctv(toc, registry);
-        bctv.containerSizes().setSize("",str.size());
         bctv.apply(dbl_vec, &str2);
-        BOOST_TEST_CHECKPOINT("BackConvert a string");
-        BOOST_CHECK( str2.size() == str.size());
-        BOOST_CHECK( str2 == str);
+        BOOST_TEST_CHECKPOINT("BackConvert a string size 12 into a string size " << i);
+        if (i == 0)
+            BOOST_CHECK( str2.empty() );
+        else if (i > 0 && i <= str.size())
+            BOOST_CHECK( str2 == str.substr(0,i));
+        else
+            BOOST_CHECK( str2.substr(0,12) == str);
     }
 }
 
@@ -293,13 +284,12 @@ BOOST_AUTO_TEST_CASE( test_backconvert_vector_in_struct )
         BOOST_CHECK( dv_test.dbl_vector[2] == 1.0);
     }
 
-    for (int i = 0; i <= 4; i++) {
+    {
         DoubleVector dv_test;
-        if (i > 0) dv_test.dbl_vector.resize(i);
-        dv_test.a = i;
+        dv_test.dbl_vector.resize(2);
+        dv_test.a = 0;
 
         BackConverter bctv(toc, registry);
-        bctv.containerSizes().setSize("dbl_vector",2);
         bctv.apply(dbl_vec, &dv_test);
         BOOST_TEST_CHECKPOINT("BackConvert a container inside a struct");
         BOOST_CHECK( dv_test.a == 23);
@@ -325,15 +315,6 @@ BOOST_AUTO_TEST_CASE( test_backconvert_array_of_containers )
         for (int i=0; i<va.dbl_vector_array[j].size(); i++)
             dbl_vec.push_back(va.dbl_vector_array[j][i]);
 
-    {
-        VectorArray va_test;
-        BackConverter bctv(toc, registry);
-        bctv.containerSizes().setSize("dbl_vector.0",1);
-        bctv.containerSizes().setSize("dbl_vector.2",2);
-        bctv.apply(dbl_vec, &va_test);
-        BOOST_TEST_CHECKPOINT("BackConvert array of containers, give sizes");
-        BOOST_CHECK( va_test.equals(va) );
-    }
     {
         VectorArray va_test;
         va_test.dbl_vector_array[0].resize(1);
@@ -404,30 +385,6 @@ BOOST_AUTO_TEST_CASE( test_backconvert_container_container )
         BOOST_TEST_CHECKPOINT("BackConvert container of containers, presize");
         BOOST_CHECK( cc_test.equals(cc) );
     }
-    {
-        ContainerContainer cc_test;
-
-        BackConverter bctv(toc, registry);
-        bctv.apply(dbl_vec, &cc_test);
-        bctv.containerSizes().setSize("dbl_vv", 3);
-        bctv.containerSizes().setSize("dbl_vv.0.dbl_vector", 1);
-        bctv.containerSizes().setSize("dbl_vv.1.dbl_vector", 3);
-        bctv.containerSizes().setSize("dbl_vv.2.dbl_vector", 2);
-        BOOST_TEST_CHECKPOINT("BackConvert container of containers, set sizes");
-        BOOST_CHECK( cc_test.equals(cc) );
-    }
-    {
-        ContainerContainer cc_test;
-        cc_test.dbl_vv.resize(3);
-
-        BackConverter bctv(toc, registry);
-        bctv.containerSizes().setSize("dbl_vv.0.dbl_vector", 1);
-        bctv.containerSizes().setSize("dbl_vv.1.dbl_vector", 3);
-        bctv.containerSizes().setSize("dbl_vv.2.dbl_vector", 2);
-        bctv.apply(dbl_vec, &cc_test);
-        BOOST_TEST_CHECKPOINT("BackConvert container of containers, presize");
-        BOOST_CHECK( cc_test.equals(cc) );
-    }
 }
 
 BOOST_AUTO_TEST_CASE( test_backconvert_two_array )
@@ -470,7 +427,7 @@ BOOST_AUTO_TEST_CASE( test_backconvert_array_with_slice ) {
         
         double d3[] = {1.4, 11.0, 54.8};
         fbctv.apply(dbl_vec, d3);
-        BOOST_CHECK( d == d3 );        
+        for (int i = 0; i < 3; i++) BOOST_CHECK( d[i] == d3[i] );
     }
     
     {
@@ -491,12 +448,16 @@ BOOST_AUTO_TEST_CASE( test_backconvert_array_with_slice ) {
         FlatBackConverter fbctv(toc);
         fbctv.setSlice("[1,12,13-17:2]");
         
-        double d20[] = { -2.0, -3.3, -0.8, -0.2, 0.4, 
-                          1.0,  1.6,  2.2,  2.8, 3.4,
-                          4.0,  4.6, -3.3, -3.3, 6.4,
-                         -3.3,  7.6, -3.3,  8.8, 9.4 }; 
+        double d20[20];
+        for (int i = 0; i < 20; i++) d20[i] = d[i];
+        d20[1] = -3.3;
+        d20[12] = -3.3;
+        d20[13] = -3.3;
+        d20[15] = -3.3;
+        d20[17] = -3.3;
+
         fbctv.apply(dbl_vec, d20);
-        BOOST_CHECK( d == d20 );        
+        for (int i = 0; i < 20; i++) BOOST_CHECK( d[i] == d20[i] );
     }
 
 }
@@ -552,12 +513,11 @@ BOOST_AUTO_TEST_CASE( test_backconvert_string_with_slice )
     
     {
         std::string str2;
+        str2.resize(12);
         BackConverter bctv(toc, registry);
         bctv.setSlice("[0,6-10]");
-        bctv.containerSizes().setSize("",12);
         bctv.apply(dbl_vec, &str2);
         BOOST_TEST_CHECKPOINT( "string with slice, size set");
-        BOOST_CHECK(str.size() == str2.size());
         BOOST_CHECK(str[0] == str2[0]);
         BOOST_CHECK(str[6] == str2[6]);
         BOOST_CHECK(str[7] == str2[7]);
