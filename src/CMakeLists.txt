@@ -5,6 +5,7 @@ set(LIBSOURCES  Utilities.cpp
                 SliceMatcher.cpp
                 VectorBuilder.cpp
                 MatrixBuffer.cpp
+                BackConverter.cpp
 )
 
 set(LIBHEADERS  Utilities.hpp
@@ -16,6 +17,7 @@ set(LIBHEADERS  Utilities.hpp
                 SliceMatcher.hpp
                 VectorBuilder.hpp
                 MatrixBuffer.hpp
+                BackConverter.hpp
 )
 
 rock_library(type_to_vector

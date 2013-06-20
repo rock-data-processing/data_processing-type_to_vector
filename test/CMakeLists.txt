@@ -21,6 +21,7 @@ set(TESTFILES   TestSuite.cpp
                 TestFlatConversion.cpp
                 TestVectorBuilder.cpp
                 TestBuffer.cpp
+                TestBackConversion.cpp
 )
 
 rock_executable( type_to_vector_test
