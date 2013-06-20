@@ -15,6 +15,7 @@ void VectorTocMaker::push_valueinfo(Typelib::Type const& type) {
     info.placeDescription = utilmm::join(mPlaceStack,".");
     info.position = mPositionStack.back(); //position();
     info.castFun = getCastFunction(type);
+    info.backCastFun = getBackCastFunction(type);
     info.containerType = "";
         
     mToc.push_back(info);
@@ -27,6 +28,7 @@ void VectorTocMaker::push_container(Typelib::Type const& type ,VectorTocPointer 
     info.placeDescription = utilmm::join(mPlaceStack,".");
     info.position = mPositionStack.back(); //position();
     info.castFun = 0;
+    info.backCastFun = 0;
     info.content = toc_ptr;
     info.containerType = type.getName();
 

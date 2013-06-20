@@ -33,6 +33,7 @@ struct VectorValueInfo {
     std::string placeDescription; //!< Something like position.3, rotation.im.1 or ...
     unsigned int position; //!< The position in bytes in the memory of this value.
     CastFunction castFun; //!< To cast the value, 0 for container or other type.
+    BackCastFunction backCastFun; //!< Cast it back to the original type.
     VectorTocPointer content; //!< Subcontent (is needed for containers).
     std::string containerType; //!< Type name of the content aka container.
 
