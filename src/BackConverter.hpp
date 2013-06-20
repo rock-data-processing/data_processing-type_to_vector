@@ -59,10 +59,13 @@ public:
     void setSlice(const std::string& slice);
 
 protected:
+    virtual void setElement(const VectorValueInfo& info);
     virtual void visit(const VectorValueInfo& info);
 
     void* mpData;
     SliceMatcher* mpMatcher;
+    const VectorOfDoubles* mpVec;
+    unsigned int mElementCounter;
 };
 
 /** Give the size of a conatiner. */

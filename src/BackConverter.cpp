@@ -20,9 +20,33 @@ FlatBackConverter::~FlatBackConverter() {
 }
 
 void FlatBackConverter::apply(const VectorOfDoubles& vec, void* data) {
+
+    mpData = data;
+    mpVec = &vec;
+    mElementCounter = 0;
+
+    VectorTocVisitor::visit(mToc);
+
+    mpVec = 0;
+    mpData = 0;
+}
+
+void FlatBackConverter::setElement(const VectorValueInfo& info) {
+
+    if (mElementCounter >= mpVec->size()) return;
+
+    if (!mpMatcher || mpMatcher->fitsASlice(info.placeDescription)) {
+
+        void* ptr = mpData + info.position;
+        info.backCastFun(ptr, mpVec->at(mElementCounter));
+        mElementCounter++;
+    }
 }
 
 void FlatBackConverter::visit(const VectorValueInfo& info) {
+
+    // Pointer to content equals zero means no container.
+    if (!info.content.get()) setElement(info);
 }
 
 void BackConverter::visit(const VectorValueInfo& info) {
