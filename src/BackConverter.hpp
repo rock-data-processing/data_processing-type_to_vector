@@ -19,6 +19,8 @@ class SliceMatcher;
 class AbstractBackConverter {
 
 public:
+    typedef boost::shared_ptr<AbstractBackConverter> Pointer;
+
     /** The constructor of any BackConverter takes the toc for the type it is
      *  meant for. 
      */
@@ -40,8 +42,7 @@ public:
         apply(vod, target);  
     }
 
-protected:
-    const VectorToc& mToc;
+    const VectorToc mToc;
 };
 
 /** Only fills level one of the type with the vector data. 
