@@ -23,7 +23,7 @@ set(LIBHEADERS  Utilities.hpp
 rock_library(type_to_vector
     SOURCES ${LIBSOURCES}
     HEADERS ${LIBHEADERS}
-    DEPS_PKGCONFIG typelib eigen3
+    DEPS_PKGCONFIG typelib eigen3 utilmm
     DEPS_CMAKE Boost)
 
 target_link_libraries(type_to_vector boost_system)
