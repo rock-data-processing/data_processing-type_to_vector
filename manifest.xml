@@ -1,12 +1,28 @@
 <package>
   <description brief="Converts types into vectors.">
-      Puts the values of types used in rock for transport into a double vector.
+      A library to convert typed data understood by orogen into raw data vectors. This is highly useful when writing type-agnostic components, e.g data filters, learning algorithms or statistics. 
   </description>
   <author>Felix Rehrmann/felix.rehrmann@dfki.de</author>
+  <maintainer>Dennis Mronga/dennis.mronga@dfki.de</maintainer>
   <copyright>DFKI/robotik@dfki.de</copyright>
   <license>LGPL v2 or later</license>
   <url>http://</url>
   <logo>http://</logo>
+  <tags>stable</tags>
+  <keywords>
+     <keyword>Utilities</keyword>
+     <keyword>Middleware</keyword>
+   </keywords>
+
+  <stage>-1</stage>
+  <use>multi project</use>
+  <activity>active</activity>
+
+  <classifiers>
+    <classifier>c++</classifier>
+    <classifier>rock</classifier>
+    <classifier>ubuntu</classifier>
+  </classifiers>
 
   <depend package="base/cmake" />
   <depend package="typelib" />
