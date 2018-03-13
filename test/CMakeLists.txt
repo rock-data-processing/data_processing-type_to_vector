@@ -8,6 +8,7 @@
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${CMAKE_BINARY_DIR}/test)
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 configure_file(create_tlb.rb.in ${CMAKE_BINARY_DIR}/test/create_tlb.rb)
 configure_file(TestSuite.hpp.in ${CMAKE_BINARY_DIR}/test/TestSuite.hpp)
@@ -29,18 +30,20 @@ rock_executable( type_to_vector_test
     DEPS type_to_vector
     DEPS_CMAKE Boost
     NOINSTALL)
+target_link_libraries(type_to_vector_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 add_custom_command( TARGET type_to_vector_test POST_BUILD
     COMMAND "ruby" ARGS "create_tlb.rb" ">" "TestTypes.tlb") 
 
 rock_executable( type_to_vector_timing
-    SOURCES TestSuite.cpp Timing.cpp  
+    SOURCES TestSuite.cpp Timing.cpp
     DEPS type_to_vector
-    DEPS_CMAKE Boost
     NOINSTALL)
+target_link_libraries(type_to_vector_timing ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 rock_executable( slice_timing_cmp
-    SOURCES SliceTiming.cpp  
+    SOURCES SliceTiming.cpp
     DEPS type_to_vector
     NOINSTALL)
+target_link_libraries(slice_timing_cmp ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
